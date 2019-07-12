@@ -4,7 +4,7 @@ AutoPub enables project maintainers to release new package versions to PyPI by m
 
 ## Environment
 
-AutoPub is intended for use with continuous integration (CI) systems and currently supports CircleCI. Projects used with AutoPub are assumed to be managed via [Poetry][].Support for other CI and build systems is planned and contributions adding such support would be welcome.
+AutoPub is intended for use with continuous integration (CI) systems and currently supports CircleCI. Projects used with AutoPub are assumed to be managed via [Poetry][]. Support for other CI and build systems is planned and contributions adding such support would be welcome.
 
 ## Configuration
 
