@@ -32,7 +32,14 @@ def deploy(arguments):
 
 
 def parse_arguments():
+    try:
+        version = __import__("pkg_resources").get_distribution("autopub").version
+    except Exception:
+        version = "unknown"
+
     parser = argparse.ArgumentParser()
+    parser.add_argument("--version", action="version", version=version)
+
     subparsers = parser.add_subparsers()
 
     check_parser = subparsers.add_parser("check")
