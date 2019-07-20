@@ -17,7 +17,8 @@ elif os.environ.get("TRAVIS"):
     CI_SYSTEM = "travis"
     REPO_SLUG = os.environ.get("TRAVIS_REPO_SLUG")
 else:
-    CI_SYSTEM = None
+    CI_SYSTEM = os.environ.get("CI_SYSTEM", None)
+    REPO_SLUG = os.environ.get("REPO_SLUG", None)
 
 # Project root and file name configuration
 
