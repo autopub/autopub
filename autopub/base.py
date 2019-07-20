@@ -77,9 +77,6 @@ VERSION_STRINGS = (
 
 GIT_USERNAME = config.get("tool", {}).get("autopub", {}).get("git-username")
 GIT_EMAIL = config.get("tool", {}).get("autopub", {}).get("git-email")
-if not GIT_USERNAME or not GIT_EMAIL:
-    print("git-username and git-email must be defined in the pyproject file")
-    sys.exit(1)
 
 
 def run_process(popenargs):
@@ -129,5 +126,8 @@ def get_release_info():
 
 
 def configure_git():
+    if not GIT_USERNAME or not GIT_EMAIL:
+        print("git-username and git-email must be defined in the pyproject file")
+        sys.exit(1)
     git(["config", "user.name", GIT_USERNAME])
     git(["config", "user.email", GIT_EMAIL])

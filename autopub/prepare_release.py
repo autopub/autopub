@@ -7,8 +7,9 @@ sys.path.append(os.path.dirname(__file__))  # noqa
 from datetime import datetime
 
 from base import (
-    run_process,
+    configure_git,
     get_release_info,
+    run_process,
     CHANGELOG_FILE,
     CHANGELOG_HEADER,
     ROOT,
@@ -35,6 +36,8 @@ def update_version_strings(file_path, new_version):
 
 
 def prepare_release():
+    configure_git()
+
     POETRY_DUMP_VERSION_OUTPUT = re.compile(
         r"Bumping version from \d+\.\d+\.\d+ to (?P<version>\d+\.\d+\.\d+)"
     )
