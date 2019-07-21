@@ -3,17 +3,16 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from base import run_process
+from build_release import build_release
 from create_github_release import create_github_release
-from prepare_release import prepare_release
 from commit_release import git_commit_and_push
+from prepare_release import prepare_release
+from publish_release import publish_release
 
 
 def deploy_release():
     prepare_release()
-    run_process(["poetry", "build"])
+    build_release()
     git_commit_and_push()
     create_github_release()
-    run_process(
-        ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
-    )
+    publish_release()

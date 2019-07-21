@@ -86,6 +86,18 @@ VERSION_STRINGS = dict_get(
     config, ["tool", "autopub", "version-strings"], default=[]
 )
 
+PYPI_URL = dict_get(
+    config, ["tool", "autopub", "pypi-url"], default="https://pypi.org/"
+)
+
+BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
+if not BUILD_SYSTEM:
+    build_requires = dict_get(config, ["build-system", "requires"])
+    if "poetry" in build_requires:
+        BUILD_SYSTEM = "poetry"
+    elif "setuptools" in build_requires:
+        BUILD_SYSTEM = "setuptools"
+
 # Git configuration
 
 GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
