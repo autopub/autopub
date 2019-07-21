@@ -79,8 +79,8 @@ GIT_USERNAME = config.get("tool", {}).get("autopub", {}).get("git-username")
 GIT_EMAIL = config.get("tool", {}).get("autopub", {}).get("git-email")
 
 
-def run_process(popenargs):
-    return subprocess.check_output(popenargs).decode("ascii").strip()
+def run_process(popenargs, encoding="ascii"):
+    return subprocess.check_output(popenargs).decode(encoding).strip()
 
 
 def git(popenargs):
