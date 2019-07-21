@@ -19,16 +19,14 @@ from base import (
 
 
 def update_version_strings(file_path, new_version):
-    VERSION_REGEX = re.compile(
-        r"(^(__)?version(__)?\s*=\s*\")(?P<version>\d+\.\d+\.\d+)\"$"
-    )
+    version_regex = re.compile(r"(^_*?version_*?\s*=\s*['\"])(\d+\.\d+\.\d+)", re.M)
     with open(file_path, "r+") as f:
         content = f.read()
         f.seek(0)
         f.write(
             re.sub(
-                VERSION_REGEX,
-                lambda match: '{}{}"'.format(match.group(1), new_version),
+                version_regex,
+                lambda match: "{}{}".format(match.group(1), new_version),
                 content,
             )
         )
