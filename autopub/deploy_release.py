@@ -12,8 +12,8 @@ from commit_release import git_commit_and_push
 def deploy_release():
     prepare_release()
     run_process(["poetry", "build"])
-    create_github_release()
     git_commit_and_push()
+    create_github_release()
     run_process(
         ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
     )
