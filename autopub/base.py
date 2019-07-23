@@ -6,6 +6,19 @@ import sys
 from pathlib import Path
 from tomlkit import parse
 
+
+def dict_get(_dict, keys, default=None):
+    """
+    Query nested dictionary with list of keys, returning None if not found.
+    """
+    for key in keys:
+        if isinstance(_dict, dict):
+            _dict = _dict.get(key, default)
+        else:
+            return default
+    return _dict
+
+
 # Determine CI/CD environment
 
 if os.environ.get("CIRCLECI"):
@@ -44,9 +57,9 @@ else:
     print(f"Could not find pyproject file at: {PYPROJECT_FILE}")
     sys.exit(1)
 
-PROJECT_NAME = config.get("tool", {}).get("autopub", {}).get("project-name")
+PROJECT_NAME = dict_get(config, ["tool", "autopub", "project-name"])
 if not PROJECT_NAME:
-    PROJECT_NAME = config.get("tool", {}).get("poetry", {}).get("name")
+    PROJECT_NAME = dict_get(config, ["tool", "poetry", "name"])
 if not PROJECT_NAME:
     print(
         "Could not determine project name. Under the pyproject file's "
@@ -54,29 +67,29 @@ if not PROJECT_NAME:
     )
     sys.exit(1)
 
-RELEASE_FILE_NAME = (
-    config.get("tool", {}).get("autopub", {}).get("release-file", "RELEASE.md")
+RELEASE_FILE_NAME = dict_get(
+    config, ["tool", "autopub", "release-file"], default="RELEASE.md"
 )
 RELEASE_FILE = ROOT / RELEASE_FILE_NAME
 
-CHANGELOG_FILE_NAME = (
-    config.get("tool", {}).get("autopub", {}).get("changelog-file", "CHANGELOG.md")
+CHANGELOG_FILE_NAME = dict_get(
+    config, ["tool", "autopub", "changelog-file"], default="CHANGELOG.md"
 )
 CHANGELOG_FILE = ROOT / CHANGELOG_FILE_NAME
 
-CHANGELOG_HEADER = (
-    config.get("tool", {}).get("autopub", {}).get("changelog-header", "=========")
+CHANGELOG_HEADER = dict_get(
+    config, ["tool", "autopub", "changelog-header"], default="========="
 )
 
-VERSION_HEADER = config.get("tool", {}).get("autopub", {}).get("version-header", "-")
-VERSION_STRINGS = (
-    config.get("tool", {}).get("autopub", {}).get("version-strings", [])
+VERSION_HEADER = dict_get(config, ["tool", "autopub", "version-header"], default="-")
+VERSION_STRINGS = dict_get(
+    config, ["tool", "autopub", "version-strings"], default=[]
 )
 
 # Git configuration
 
-GIT_USERNAME = config.get("tool", {}).get("autopub", {}).get("git-username")
-GIT_EMAIL = config.get("tool", {}).get("autopub", {}).get("git-email")
+GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
+GIT_EMAIL = dict_get(config, ["tool", "autopub", "git-email"])
 
 
 def run_process(popenargs, encoding="ascii"):
