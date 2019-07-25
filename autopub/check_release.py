@@ -14,4 +14,4 @@ def check_release():
         if CI_SYSTEM == "circleci":
             run_process(["circleci", "step", "halt"])
         elif CI_SYSTEM == "travis":
-            run_process(["travis_terminate", "0"])
+            sys.exit(1)
