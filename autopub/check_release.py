@@ -3,8 +3,6 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from datetime import datetime
-
 from base import CI_SYSTEM, RELEASE_FILE, run_process
 
 
