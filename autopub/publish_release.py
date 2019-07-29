@@ -7,10 +7,17 @@ from base import BUILD_SYSTEM, PYPI_URL, run_process
 
 subprocess_output_encoding = "ascii"
 
-if BUILD_SYSTEM == "poetry":
-    pub_cmd = ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
+poetry_pub = ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
+
+if PYPI_URL:
+    twine_pub = ["twine", "upload", "--repository-url", PYPI_URL, "dist/*"]
 else:
-    pub_cmd = ["twine", "upload", "--repository-url", PYPI_URL, "dist/*"]
+    twine_pub = ["twine", "upload", "dist/*"]
+
+if BUILD_SYSTEM == "poetry":
+    pub_cmd = poetry_pub
+else:
+    pub_cmd = twine_pub
     subprocess_output_encoding = "utf-8"
 
 

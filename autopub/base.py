@@ -86,9 +86,7 @@ VERSION_STRINGS = dict_get(
     config, ["tool", "autopub", "version-strings"], default=[]
 )
 
-PYPI_URL = dict_get(
-    config, ["tool", "autopub", "pypi-url"], default="https://pypi.org/"
-)
+PYPI_URL = dict_get(config, ["tool", "autopub", "pypi-url"])
 
 BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
 if not BUILD_SYSTEM:
