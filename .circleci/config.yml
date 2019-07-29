@@ -1,0 +1,49 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - run: poetry config settings.virtualenvs.in-project true
+      - restore_cache:
+          key: deps-{{ .Branch }}-{{ checksum "poetry.lock" }}
+      - run:
+          command: poetry install
+      - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.7/site-packages"
+  deploy:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - add_ssh_keys
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - run: pip install githubrelease
+      - run: pip install --pre autopub
+      - run: autopub check
+      - run: autopub prepare
+      - run: poetry build
+      - run: autopub commit
+      - run: autopub githubrelease
+      - run: poetry publish -u $PYPI_USERNAME -p $PYPI_PASSWORD
+
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - test
+  deploy:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: master
