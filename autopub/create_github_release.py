@@ -12,6 +12,7 @@ from base import (
     configure_git,
     PROJECT_NAME,
     REPO_SLUG,
+    TAG_PREFIX,
     get_release_info,
 )
 
@@ -19,6 +20,7 @@ from base import (
 def create_github_release():
     configure_git()
     version = get_project_version()
+    tag = f"{TAG_PREFIX}{version}"
 
     if not version:
         print("Unable to determine the current version")
@@ -26,13 +28,13 @@ def create_github_release():
 
     tag_exists = (
         check_exit_code(
-            [f'git show-ref --tags --quiet --verify -- "refs/tags/{version}"']
+            [f'git show-ref --tags --quiet --verify -- "refs/tags/{tag}"']
         )
         == 0
     )
 
     if not tag_exists:
-        run_process(["git", "tag", version])
+        run_process(["git", "tag", tag])
         run_process(["git", "push", "--tags"])
 
     _, changelog = get_release_info()

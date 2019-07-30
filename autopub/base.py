@@ -86,6 +86,8 @@ VERSION_STRINGS = dict_get(
     config, ["tool", "autopub", "version-strings"], default=[]
 )
 
+TAG_PREFIX = dict_get(config, ["tool", "autopub", "tag-prefix"], default="")
+
 PYPI_URL = dict_get(config, ["tool", "autopub", "pypi-url"])
 
 BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
