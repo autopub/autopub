@@ -41,7 +41,7 @@ def create_github_release():
 
     gh_release_create(
         REPO_SLUG,
-        version,
+        tag,
         publish=True,
         name=f"{PROJECT_NAME} {version}",
         body=changelog,
