@@ -8,9 +8,7 @@ from tomlkit import parse
 
 
 def dict_get(_dict, keys, default=None):
-    """
-    Query nested dictionary with list of keys, returning None if not found.
-    """
+    """Query nested dictionary with list of keys, returning None if not found."""
     for key in keys:
         if isinstance(_dict, dict):
             _dict = _dict.get(key, default)
