@@ -102,7 +102,7 @@ GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
 GIT_EMAIL = dict_get(config, ["tool", "autopub", "git-email"])
 
 
-def run_process(popenargs, encoding="ascii"):
+def run_process(popenargs, encoding="utf-8"):
     return subprocess.check_output(popenargs).decode(encoding).strip()
 
 
