@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.1.2 - 2019-08-23
+------------------
+
+Switch default subprocess output decoding from ASCII to UTF-8.
+
 0.1.1 - 2019-07-30
 ------------------
 
