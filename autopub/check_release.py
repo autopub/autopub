@@ -11,5 +11,5 @@ def check_release():
         print("Not releasing a new version because there is no RELEASE file.")
         if CI_SYSTEM == "circleci":
             run_process(["circleci", "step", "halt"])
-        elif CI_SYSTEM == "travis":
+        elif (CI_SYSTEM == "github" or CI_SYSTEM == "travis"):
             sys.exit(1)
