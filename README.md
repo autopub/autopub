@@ -4,7 +4,7 @@ AutoPub enables project maintainers to release new package versions to PyPI by m
 
 ## Environment
 
-AutoPub is intended for use with continuous integration (CI) systems such as [CircleCI][] or [Travis CI][]. Projects used with AutoPub can be published via [Poetry][] or [setuptools][]. Contributions that add support for other CI and build systems are welcome.
+AutoPub is intended for use with continuous integration (CI) systems such as [GitHub Actions][], [CircleCI][], or [Travis CI][]. Projects used with AutoPub can be published via [Poetry][] or [setuptools][]. Contributions that add support for other CI and build systems are welcome.
 
 ## Configuration
 
@@ -45,6 +45,7 @@ For systems such as Travis CI in which only one deployment step is permitted, th
 * `autopub deploy`: Run `prepare`, `build`, `commit`, `githubrelease`, and `publish` in one invocation.
 
 
+[GitHub Actions]: https://github.com/features/actions
 [CircleCI]: https://circleci.com
 [Travis CI]: https://travis-ci.org
 [Poetry]: https://poetry.eustace.io
