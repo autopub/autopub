@@ -14,7 +14,7 @@ githubrelease = {version = "^1.5.8",optional = true}
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
-black = {version = "^19.3b0",allows-prereleases = true}
+black = {version = "^19.3b0",allow-prereleases = true}
 flake8 = "^3.7"
 flake8-black = "^0.1.0"
 flake8-bugbear = "^19.3"
@@ -36,5 +36,5 @@ git-email = "botpub@autopub.rocks"
 line-length = 85
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0"]
 build-backend = "poetry.masonry.api"
