@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.1.4 - 2020-02-27
+------------------
+
+Ensure AutoPub can be used without installing `github_release`
+
 0.1.3 - 2019-11-14
 ------------------
 
