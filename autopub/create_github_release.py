@@ -3,8 +3,6 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from github_release import gh_release_create
-
 from base import (
     run_process,
     check_exit_code,
@@ -18,6 +16,12 @@ from base import (
 
 
 def create_github_release():
+    try:
+        from github_release import gh_release_create
+    except ModuleNotFoundError:
+        print("Cannot create GitHub release due to missing dependency: github_release")
+        sys.exit(1)
+
     configure_git()
     version = get_project_version()
     tag = f"{TAG_PREFIX}{version}"
