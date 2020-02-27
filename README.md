@@ -1,5 +1,7 @@
 # AutoPub
 
+[![Build Status](https://img.shields.io/circleci/build/github/autopub/autopub)](https://circleci.com/gh/autopub/autopub) [![PyPI Version](https://img.shields.io/pypi/v/autopub)](https://pypi.org/project/autopub/)
+
 AutoPub enables project maintainers to release new package versions to PyPI by merging pull requests.
 
 ## Environment
