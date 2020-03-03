@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from base import BUILD_SYSTEM, PYPI_URL, run_process
+from base import BUILD_SYSTEM, PYPI_URL, S3PYPI_COMMAND, run_process
 
 poetry_pub = ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
 
@@ -17,6 +17,8 @@ if BUILD_SYSTEM == "poetry":
 else:
     pub_cmd = twine_pub
 
+if S3PYPI_COMMAND:
+    pub_cmd = S3PYPI_COMMAND.split()
 
 def publish_release():
     run_process(pub_cmd)

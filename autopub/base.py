@@ -99,6 +99,18 @@ if not BUILD_SYSTEM:
     elif "setuptools" in build_requires:
         BUILD_SYSTEM = "setuptools"
 
+S3PYPI_COMMAND = dict_get(
+    config, ["tool", "autopub", "s3pypi-command"], default=""
+)
+
+if S3PYPI_COMMAND:
+    try:
+        import s3pypi
+    except ModuleNotFoundError:
+        print("Seems you configured s3pypi command but it is not installed...")
+        sys.exit(1)
+
+
 # Git configuration
 
 GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
