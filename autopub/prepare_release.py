@@ -1,23 +1,23 @@
 import os
 import re
 import sys
-
-sys.path.append(os.path.dirname(__file__))  # noqa
-
 from datetime import datetime
 
 from base import (
-    configure_git,
-    get_release_info,
-    run_process,
     CHANGELOG_FILE,
     CHANGELOG_HEADER,
     ROOT,
     VERSION_HEADER,
     VERSION_STRINGS,
+    configure_git,
+    get_release_info,
+    run_process,
 )
 
 from github_contributor import append_github_contributor
+
+
+sys.path.append(os.path.dirname(__file__))  # noqa
 
 
 def update_version_strings(file_path, new_version):

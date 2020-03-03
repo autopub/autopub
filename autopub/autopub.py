@@ -2,8 +2,6 @@ import argparse
 import os
 import sys
 
-sys.path.append(os.path.dirname(__file__))  # noqa
-
 from build_release import build_release
 from check_release import check_release
 from commit_release import git_commit_and_push
@@ -11,6 +9,9 @@ from create_github_release import create_github_release
 from deploy_release import deploy_release
 from prepare_release import prepare_release
 from publish_release import publish_release
+
+
+sys.path.append(os.path.dirname(__file__))  # noqa
 
 
 def check(arguments):

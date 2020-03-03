@@ -1,9 +1,10 @@
 import os
 import sys
 
-sys.path.append(os.path.dirname(__file__))  # noqa
-
 from base import CI_SYSTEM, RELEASE_FILE, run_process
+
+
+sys.path.append(os.path.dirname(__file__))  # noqa
 
 
 def check_release():

@@ -1,9 +1,11 @@
 import os
 import sys
 
+from base import BUILD_SYSTEM, PYPI_URL, run_process
+
+
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from base import BUILD_SYSTEM, PYPI_URL, run_process
 
 poetry_pub = ["poetry", "publish", "-u", "$PYPI_USERNAME", "-p", "$PYPI_PASSWORD"]
 
