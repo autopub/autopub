@@ -118,7 +118,11 @@ GIT_EMAIL = dict_get(config, ["tool", "autopub", "git-email"])
 
 
 def run_process(popenargs, encoding="utf-8"):
-    return subprocess.check_output(popenargs).decode(encoding).strip()
+    try:
+        return subprocess.check_output(popenargs).decode(encoding).strip()
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        sys.exit(1)
 
 
 def git(popenargs):
