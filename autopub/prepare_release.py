@@ -61,6 +61,10 @@ def prepare_release():
     old_changelog_data = ""
     header = ""
 
+    if not CHANGELOG_FILE.is_file():
+        with open(CHANGELOG_FILE, "a+") as f:
+            f.write(f"CHANGELOG\n{CHANGELOG_HEADER}\n\n")
+
     with open(CHANGELOG_FILE, "r") as f:
         lines = f.readlines()
 
