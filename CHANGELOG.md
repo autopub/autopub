@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.1.5 - 2020-03-18
+------------------
+
+Create CHANGELOG file if it does not exist
+
 0.1.4 - 2020-02-27
 ------------------
 
