@@ -8,7 +8,7 @@ readme = "README.md"
 keywords = ["automatic", "packaging", "publish", "release", "version"]
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = "^3.6"
 tomlkit = "^0.5.5"
 githubrelease = {version = "^1.5.8",optional = true}
 
