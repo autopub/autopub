@@ -1,3 +1,3 @@
 Release type: patch
 
-Add support for python >= 3.6
+Change minimum Python version from 3.7 to 3.6
