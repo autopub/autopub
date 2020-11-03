@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.1.7 - 2020-11-03
+------------------
+
+Update dependency specifications to more up-to-date versions
+
 0.1.6 - 2020-04-23
 ------------------
 
