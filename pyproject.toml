@@ -9,15 +9,15 @@ keywords = ["automatic", "packaging", "publish", "release", "version"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-tomlkit = "^0.5.5"
+tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.8",optional = true}
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
 black = {version = "^19.3b0",allow-prereleases = true}
-flake8 = "^3.7"
-flake8-black = "^0.1.0"
-flake8-bugbear = "^19.3"
+flake8 = "^3.8"
+flake8-black = "^0.2"
+flake8-bugbear = "^20.0"
 flake8-fixme = "^1.1"
 flake8-markdown = "^0.2.0"
 
@@ -36,5 +36,5 @@ git-email = "botpub@autopub.rocks"
 line-length = 85
 
 [build-system]
-requires = ["poetry>=1.0"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
