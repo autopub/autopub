@@ -17,6 +17,8 @@ from base import (
     VERSION_STRINGS,
 )
 
+from github_contributor import append_github_contributor
+
 
 def update_version_strings(file_path, new_version):
     version_regex = re.compile(r"(^_*?version_*?\s*=\s*['\"])(\d+\.\d+\.\d+)", re.M)
@@ -85,6 +87,7 @@ def prepare_release():
         f.write(f"{VERSION_HEADER * len(new_version_header)}\n\n")
 
         f.write(release_changelog)
+        append_github_contributor(f)
         f.write("\n")
 
         f.write("".join(old_changelog_data))

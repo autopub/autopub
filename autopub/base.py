@@ -104,6 +104,11 @@ if not BUILD_SYSTEM:
 GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
 GIT_EMAIL = dict_get(config, ["tool", "autopub", "git-email"])
 
+# GitHub
+
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
+APPEND_GITHUB_CONTRIBUTOR = dict_get(config, ['tool', 'autopub', 'append-github-contributor'], False)
+
 
 def run_process(popenargs, encoding="utf-8"):
     return subprocess.check_output(popenargs).decode(encoding).strip()
