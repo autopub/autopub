@@ -11,6 +11,7 @@ keywords = ["automatic", "packaging", "publish", "release", "version"]
 python = "^3.6"
 tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.8",optional = true}
+httpx = {version = "=0.16.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
@@ -22,7 +23,7 @@ flake8-fixme = "^1.1"
 flake8-markdown = "^0.2.0"
 
 [tool.poetry.extras]
-github = ["githubrelease"]
+github = ["githubrelease", "httpx"]
 
 [tool.poetry.scripts]
 autopub = "autopub.autopub:main"
