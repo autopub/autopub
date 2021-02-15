@@ -10,12 +10,12 @@ keywords = ["automatic", "packaging", "publish", "release", "version"]
 [tool.poetry.dependencies]
 python = "^3.6"
 tomlkit = ">= 0.5, < 2.0"
-githubrelease = {version = "^1.5.8",optional = true}
+githubrelease = {version = "^1.5.8", optional = true}
 httpx = {version = "=0.16.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
-black = {version = "^19.3b0",allow-prereleases = true}
+black = {version = "^19.3b0", allow-prereleases = true}
 flake8 = "^3.8"
 flake8-black = "^0.2"
 flake8-bugbear = "^20.0"
@@ -32,9 +32,6 @@ autopub = "autopub.autopub:main"
 project-name = "AutoPub"
 git-username = "botpub"
 git-email = "botpub@autopub.rocks"
-
-[tool.black]
-line-length = 85
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

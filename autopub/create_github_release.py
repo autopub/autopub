@@ -31,9 +31,7 @@ def create_github_release():
         sys.exit(1)
 
     tag_exists = (
-        check_exit_code(
-            [f'git show-ref --tags --quiet --verify -- "refs/tags/{tag}"']
-        )
+        check_exit_code([f'git show-ref --tags --quiet --verify -- "refs/tags/{tag}"'])
         == 0
     )
 

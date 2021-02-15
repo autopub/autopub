@@ -83,9 +83,7 @@ CHANGELOG_HEADER = dict_get(
 )
 
 VERSION_HEADER = dict_get(config, ["tool", "autopub", "version-header"], default="-")
-VERSION_STRINGS = dict_get(
-    config, ["tool", "autopub", "version-strings"], default=[]
-)
+VERSION_STRINGS = dict_get(config, ["tool", "autopub", "version-strings"], default=[])
 
 TAG_PREFIX = dict_get(config, ["tool", "autopub", "tag-prefix"], default="")
 
