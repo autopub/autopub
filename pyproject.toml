@@ -46,6 +46,7 @@ autopub = "autopub.autopub:main"
 project-name = "AutoPub"
 git-username = "botpub"
 git-email = "botpub@autopub.rocks"
+append-github-contributor = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
