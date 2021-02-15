@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.2.0 - 2021-02-15
+------------------
+
+Add GitHub PR & contributor info to the changelog [[PR #17](https://github.com/autopub/autopub/pull/17) by [Marco Acierno](https://github.com/marcoacierno)]
+
 0.1.7 - 2020-11-03
 ------------------
 
