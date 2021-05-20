@@ -78,6 +78,6 @@ def append_github_contributor(file):
     file.write("\n")
     file.write("\n")
     file.write(
-        f"Contributed by [{pr_author_fullname or pr_author_username}](https://github.com/{pr_author_username}) [PR #{pr_number}](https://github.com/{REPO_SLUG}/pull/{pr_number}/)"
+        f"Contributed by [{pr_author_fullname or pr_author_username}](https://github.com/{pr_author_username}) via [PR #{pr_number}](https://github.com/{REPO_SLUG}/pull/{pr_number}/)"
     )
     file.write("\n")
