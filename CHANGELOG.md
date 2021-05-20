@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.2.1 - 2021-05-20
+------------------
+
+Update github contributor message
+
+[Marco Acierno](https://github.com/marcoacierno) [PR #21](https://github.com/autopub/autopub/pull/21/)
+
+
 0.2.0 - 2021-02-15
 ------------------
 
