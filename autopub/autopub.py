@@ -10,7 +10,6 @@ from deploy_release import deploy_release
 from prepare_release import prepare_release
 from publish_release import publish_release
 
-
 sys.path.append(os.path.dirname(__file__))  # noqa
 
 

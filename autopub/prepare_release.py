@@ -1,7 +1,7 @@
+from datetime import datetime
 import os
 import re
 import sys
-from datetime import datetime
 
 from base import (
     CHANGELOG_FILE,
@@ -74,7 +74,7 @@ def prepare_release():
         if CHANGELOG_HEADER != line.strip():
             continue
 
-        old_changelog_data = lines[index + 1 :]
+        old_changelog_data = lines[index + 1 :]  # noqa
         header = lines[: index + 1]
         break
 

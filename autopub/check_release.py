@@ -3,7 +3,6 @@ import sys
 
 from base import CI_SYSTEM, RELEASE_FILE, run_process
 
-
 sys.path.append(os.path.dirname(__file__))  # noqa
 
 

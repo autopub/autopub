@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 import re
 import subprocess
 import sys
-from pathlib import Path
 
 from tomlkit import parse
 
@@ -151,7 +151,7 @@ def get_release_info():
             sys.exit(1)
 
         type_ = match.group(1)
-        changelog = "".join([l for l in f.readlines()]).strip()
+        changelog = "".join([line for line in f.readlines()]).strip()
 
     return type_, changelog
 

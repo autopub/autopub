@@ -7,7 +7,6 @@ from create_github_release import create_github_release
 from prepare_release import prepare_release
 from publish_release import publish_release
 
-
 sys.path.append(os.path.dirname(__file__))  # noqa
 
 
