@@ -4,6 +4,7 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
+from config import init
 from build_release import build_release
 from check_release import check_release
 from commit_release import git_commit_and_push
@@ -79,5 +80,6 @@ def parse_arguments():
 
 
 def main():
+    init()
     arguments = parse_arguments()
     arguments.func(arguments)

@@ -1,21 +1,33 @@
+from dataclasses import dataclass
 import os
 import subprocess
 import sys
+from typing import Optional
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
 from base import GITHUB_TOKEN, REPO_SLUG, APPEND_GITHUB_CONTRIBUTOR
 
 
-def append_github_contributor(file):
+@dataclass
+class GitHubContributor:
+    pr_number: str
+    author_username: str
+    author_fullname: str
+
+    @property
+    def name(self) -> str:
+        return self.author_fullname or self.author_username
+
+
+def get_github_contributor() -> Optional[GitHubContributor]:
     if not APPEND_GITHUB_CONTRIBUTOR:
-        return
+        return None
 
     try:
         import httpx
     except ModuleNotFoundError:
-        print("Cannot append the GitHub contributor due to missing dependency: httpx")
-        sys.exit(1)
+        return None
 
     org, repo = REPO_SLUG.split("/")
     current_commit = (
@@ -75,9 +87,35 @@ def append_github_contributor(file):
     pr_author_username = pr["author"]["login"]
     pr_author_fullname = pr["author"].get("name", "")
 
+    return GitHubContributor(
+        pr_number=pr_number,
+        pr_author_username=pr_author_username,
+        pr_author_fullname=pr_author_fullname,
+    )
+
+
+def append_github_contributor(file):
+    if not APPEND_GITHUB_CONTRIBUTOR:
+        return
+
+    try:
+        import httpx
+    except ModuleNotFoundError:
+        print("Cannot append the GitHub contributor due to missing dependency: httpx")
+        sys.exit(1)
+
+    github_contributor = get_github_contributor()
+
+    if not github_contributor:
+        return
+
+    name = github_contributor.name
+    username = github_contributor.author_username
+    pr_number = github_contributor.pr_number
+
     file.write("\n")
     file.write("\n")
     file.write(
-        f"Contributed by [{pr_author_fullname or pr_author_username}](https://github.com/{pr_author_username}) via [PR #{pr_number}](https://github.com/{REPO_SLUG}/pull/{pr_number}/)"
+        f"Contributed by [{name}](https://github.com/{username}) via [PR #{pr_number}](https://github.com/{REPO_SLUG}/pull/{pr_number}/)"
     )
     file.write("\n")
