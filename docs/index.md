@@ -7,5 +7,6 @@
 :caption: Topic Guides
 :hidden:
 configure/index.md
+extend/index.md
 develop/index.md
 ```
