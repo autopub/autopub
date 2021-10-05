@@ -29,6 +29,13 @@ httpx = {version = "=0.16.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
+
+# Docs
+furo = "^2021.9.22"
+myst-parser = "^0.15"
+Sphinx = "^4.2"
+
+# Linting
 black = {version = "^19.3b0", allow-prereleases = true}
 flake8 = "^3.8"
 flake8-black = "^0.2"
