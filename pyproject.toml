@@ -30,8 +30,12 @@ httpx = {version = "=0.16.1", optional = true}
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
 
+# Tasks
+invoke = "^1.6"
+
 # Docs
 furo = "^2021.9.22"
+livereload = "^2.6"
 myst-parser = "^0.15"
 Sphinx = "^4.2"
 
