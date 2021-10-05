@@ -6,5 +6,6 @@
 ```{toctree}
 :caption: Topic Guides
 :hidden:
+configure/index.md
 develop/index.md
 ```
