@@ -62,5 +62,5 @@ def create_github_release():
     gh_asset_upload(
         REPO_SLUG,
         tag,
-        asset_pattern="dist/*",
+        pattern="dist/*",
     )
