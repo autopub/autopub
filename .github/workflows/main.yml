@@ -5,6 +5,7 @@ on: [push, pull_request]
 jobs:
   deploy:
     name: Deploy
+    environment: Deployment
     runs-on: ubuntu-latest
     if: ${{ github.ref=='refs/heads/main' && github.event_name!='pull_request' }}
 
