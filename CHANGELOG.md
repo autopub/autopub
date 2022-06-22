@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.2.2 - 2022-06-22
+------------------
+
+Fix error when creating GitHub releases [[PR #28](https://github.com/autopub/autopub/pull/28) by [Patrick Arminio](https://github.com/patrick91)]
+
 0.2.1 - 2021-05-20
 ------------------
 

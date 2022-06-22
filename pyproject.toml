@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autopub"
-version = "0.2.1"
+version = "0.2.2"
 description = "Automatic package release upon pull request merge"
 authors = ["Justin Mayer <entroP@gmail.com>"]
 license = "AGPL-3.0"
