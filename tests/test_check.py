@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 from autopub import Autopub
-from autopub.exceptions import ReleaseFileEmpty, ReleaseFileNotFound, ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType
+from autopub.exceptions import AutopubException, ReleaseFileEmpty, ReleaseFileNotFound, ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType
 
 
 @pytest.fixture
@@ -63,4 +63,26 @@ def test_fails_if_release_type_is_not_valid(temporary_working_directory):
     autopub = Autopub()
 
     with pytest.raises(InvalidReleaseType):
+        autopub.check()
+
+
+
+def test_runs_plugins_when_everything_is_file(temporary_working_directory, valid_release_text: str):
+    class MissingRocket(AutopubException):
+        message = "Missing rocket"
+
+    class MyValidationPlugin:
+        def __init__(self):
+            self.called = False
+
+        def validate_release_notes(self, release_notes: str):
+            if "🚀" not in release_notes:
+                raise MissingRocket()
+
+    autopub = Autopub(plugins=[MyValidationPlugin])
+
+    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file.write_text(valid_release_text)
+
+    with pytest.raises(MissingRocket):
         autopub.check()
