@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Iterable, Tuple, Type
 
-from .exceptions import (ReleaseFileEmpty, ReleaseFileNotFound,
+from .exceptions import (AutopubException, ReleaseFileEmpty, ReleaseFileNotFound,
                          ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType)
 
 
@@ -10,6 +10,9 @@ class AutopubPlugin:
         ...
 
     def release_notes_valid(self, release_notes: str):
+        ...
+
+    def release_notes_invalid(self, exception: AutopubException):
         ...
 
 
@@ -27,7 +30,13 @@ class Autopub:
 
         content = release_file.read_text()
 
-        release_type, release_notes = self._validate_release_notes(content)
+        try:
+
+            release_type, release_notes = self._validate_release_notes(content)
+        except AutopubException as e:
+            for plugin in self.plugins:
+                plugin.release_notes_invalid(e)
+            raise
 
         for plugin in self.plugins:
             plugin.release_notes_valid(release_notes)

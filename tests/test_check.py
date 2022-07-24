@@ -1,3 +1,4 @@
+import contextlib
 from pathlib import Path
 
 import pytest
@@ -105,3 +106,23 @@ def test_runs_plugin_when_ok(temporary_working_directory, valid_release_text: st
     autopub.check()
 
     assert "This is a new release." == release_notes_value
+
+
+def test_runs_plugin_when_something_is_wrong(temporary_working_directory):
+    error_value = ""
+
+    class MyPlugin(AutopubPlugin):
+        def release_notes_invalid(self, exception: AutopubException):
+            nonlocal error_value
+
+            error_value = exception.message
+
+    autopub = Autopub(plugins=[MyPlugin])
+
+    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file.write_text("Get a 🚀")
+
+    with contextlib.suppress(ReleaseNoteInvalid):
+        autopub.check()
+
+    assert "Release note is invalid" == error_value
