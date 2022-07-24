@@ -4,12 +4,8 @@ app = typer.Typer()
 
 
 @app.command()
-def prepare():
-    """This commands prepares the project for publishing.
-
-    It gets information from the pull request like author, reviewers,
-    contributors and release notes.
-    """
+def check():
+    """This commands checks if the current PR has a valid release file."""
 
     print("preparing")
 
