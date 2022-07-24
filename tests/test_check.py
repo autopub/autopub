@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from autopub import Autopub
+from autopub import Autopub, AutopubPlugin
 from autopub.exceptions import AutopubException, ReleaseFileEmpty, ReleaseFileNotFound, ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType
 
 
@@ -67,11 +67,11 @@ def test_fails_if_release_type_is_not_valid(temporary_working_directory):
 
 
 
-def test_runs_plugins_when_everything_is_file(temporary_working_directory, valid_release_text: str):
+def test_can_using_plugins_to_add_additional_validation(temporary_working_directory, valid_release_text: str):
     class MissingRocket(AutopubException):
         message = "Missing rocket"
 
-    class MyValidationPlugin:
+    class MyValidationPlugin(AutopubPlugin):
         def __init__(self):
             self.called = False
 
@@ -86,3 +86,22 @@ def test_runs_plugins_when_everything_is_file(temporary_working_directory, valid
 
     with pytest.raises(MissingRocket):
         autopub.check()
+
+
+def test_runs_plugin_when_ok(temporary_working_directory, valid_release_text: str):
+    release_notes_value = ""
+
+    class MyPlugin(AutopubPlugin):
+        def release_notes_valid(self, release_notes: str):
+            nonlocal release_notes_value
+
+            release_notes_value = release_notes
+
+    autopub = Autopub(plugins=[MyPlugin])
+
+    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file.write_text(valid_release_text)
+
+    autopub.check()
+
+    assert "This is a new release." == release_notes_value

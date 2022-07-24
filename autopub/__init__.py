@@ -1,14 +1,22 @@
 from pathlib import Path
-from typing import Iterable, Type
+from typing import Iterable, Tuple, Type
 
 from .exceptions import (ReleaseFileEmpty, ReleaseFileNotFound,
                          ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType)
 
 
+class AutopubPlugin:
+    def validate_release_notes(self, release_notes: str):
+        ...
+
+    def release_notes_valid(self, release_notes: str):
+        ...
+
+
 class Autopub:
     RELEASE_FILE_PATH = "RELEASE.md"
 
-    def __init__(self, plugins: Iterable[Type] = ()) -> None:
+    def __init__(self, plugins: Iterable[Type[AutopubPlugin]] = ()) -> None:
         self.plugins = [plugin_class() for plugin_class in plugins]
 
     def check(self) -> None:
@@ -19,9 +27,13 @@ class Autopub:
 
         content = release_file.read_text()
 
-        self._validate_release_notes(content)
+        release_type, release_notes = self._validate_release_notes(content)
 
-    def _validate_release_notes(self, release_notes: str):
+        for plugin in self.plugins:
+            plugin.release_notes_valid(release_notes)
+
+
+    def _validate_release_notes(self, release_notes: str) -> Tuple[str, str]:
         if not release_notes:
             raise ReleaseFileEmpty()
 
@@ -42,3 +54,5 @@ class Autopub:
 
         for plugin in self.plugins:
             plugin.validate_release_notes(release_notes)
+
+        return release_type, release_notes.strip()
