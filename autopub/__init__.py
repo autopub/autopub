@@ -34,4 +34,4 @@ class Autopub:
         release_type = release_info.split(":", 1)[1].strip().lower()
 
         if release_type not in ("major", "minor", "patch"):
-            raise InvalidReleaseType()
+            raise InvalidReleaseType(release_type)

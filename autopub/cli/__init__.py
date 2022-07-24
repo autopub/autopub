@@ -1,5 +1,11 @@
 import typer
 
+from autopub import Autopub
+import rich
+
+from autopub.exceptions import AutopubException
+from rich.panel import Panel
+
 app = typer.Typer()
 
 
@@ -7,7 +13,14 @@ app = typer.Typer()
 def check():
     """This commands checks if the current PR has a valid release file."""
 
-    print("preparing")
+    autopub = Autopub()
+
+    try:
+        autopub.check()
+    except AutopubException as e:
+        rich.print(Panel.fit(f"[red]{e.message}"))
+
+        raise typer.Exit(1)
 
 
 @app.command()
