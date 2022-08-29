@@ -20,7 +20,9 @@ def check():
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
+    else:
+        rich.print(Panel.fit("[green]Release file is valid"))
 
 
 @app.command()

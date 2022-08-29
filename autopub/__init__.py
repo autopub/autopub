@@ -39,6 +39,9 @@ class Autopub:
             raise
 
         for plugin in self.plugins:
+            # TODO: this name is not great, doesn't feel descriptive enough
+            # this is called when the release notes are valid
+            # maybe we can use `on_release_notes_valid` or something, same for above
             plugin.release_notes_valid(release_notes)
 
 
