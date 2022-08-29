@@ -15,10 +15,10 @@ class AutopubPlugin:
     def validate_release_notes(self, release_notes: str):
         ...
 
-    def release_notes_valid(self, release_notes: str):
+    def on_release_notes_valid(self, release_notes: str):
         ...
 
-    def release_notes_invalid(self, exception: AutopubException):
+    def on_release_notes_invalid(self, exception: AutopubException):
         ...
 
 
@@ -37,18 +37,14 @@ class Autopub:
         content = release_file.read_text()
 
         try:
-
             release_type, release_notes = self._validate_release_notes(content)
         except AutopubException as e:
             for plugin in self.plugins:
-                plugin.release_notes_invalid(e)
+                plugin.on_release_notes_invalid(e)
             raise
 
         for plugin in self.plugins:
-            # TODO: this name is not great, doesn't feel descriptive enough
-            # this is called when the release notes are valid
-            # maybe we can use `on_release_notes_valid` or something, same for above
-            plugin.release_notes_valid(release_notes)
+            plugin.on_release_notes_valid(release_notes)
 
     def _validate_release_notes(self, release_notes: str) -> Tuple[str, str]:
         if not release_notes:

@@ -102,7 +102,7 @@ def test_runs_plugin_when_ok(temporary_working_directory, valid_release_text: st
     release_notes_value = ""
 
     class MyPlugin(AutopubPlugin):
-        def release_notes_valid(self, release_notes: str):
+        def on_release_notes_valid(self, release_notes: str):
             nonlocal release_notes_value
 
             release_notes_value = release_notes
@@ -121,7 +121,7 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory):
     error_value = ""
 
     class MyPlugin(AutopubPlugin):
-        def release_notes_invalid(self, exception: AutopubException):
+        def on_release_notes_invalid(self, exception: AutopubException):
             nonlocal error_value
 
             error_value = exception.message
