@@ -1,10 +1,11 @@
 import typer
 
-from autopub import Autopub
 import rich
-
-from autopub.exceptions import AutopubException
 from rich.panel import Panel
+
+from autopub import Autopub
+from autopub.exceptions import AutopubException
+
 
 app = typer.Typer()
 

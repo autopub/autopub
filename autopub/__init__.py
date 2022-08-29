@@ -1,8 +1,14 @@
 from pathlib import Path
 from typing import Iterable, Tuple, Type
 
-from .exceptions import (AutopubException, ReleaseFileEmpty, ReleaseFileNotFound,
-                         ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType)
+from .exceptions import (
+    AutopubException,
+    InvalidReleaseType,
+    MissingReleaseType,
+    ReleaseFileEmpty,
+    ReleaseFileNotFound,
+    ReleaseNoteInvalid,
+)
 
 
 class AutopubPlugin:
@@ -43,7 +49,6 @@ class Autopub:
             # this is called when the release notes are valid
             # maybe we can use `on_release_notes_valid` or something, same for above
             plugin.release_notes_valid(release_notes)
-
 
     def _validate_release_notes(self, release_notes: str) -> Tuple[str, str]:
         if not release_notes:

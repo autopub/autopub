@@ -63,6 +63,19 @@ git-username = "botpub"
 git-email = "botpub@autopub.rocks"
 append-github-contributor = true
 
+[tool.isort]
+src_paths = ["autopub", "tests"]
+profile = "black"
+indent = 4
+combine_star = true
+combine_as_imports = true
+lines_after_imports = 2
+known_rich = ["rich"]
+known_pytest = ["pytest"]
+known_first_party = ["autopub"]
+sections = ["FUTURE", "STDLIB", "PYTEST", "THIRDPARTY", "RICH", "FIRSTPARTY", "LOCALFOLDER"]
+
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

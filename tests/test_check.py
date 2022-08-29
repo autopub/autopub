@@ -2,8 +2,16 @@ import contextlib
 from pathlib import Path
 
 import pytest
+
 from autopub import Autopub, AutopubPlugin
-from autopub.exceptions import AutopubException, ReleaseFileEmpty, ReleaseFileNotFound, ReleaseNoteInvalid, MissingReleaseType, InvalidReleaseType
+from autopub.exceptions import (
+    AutopubException,
+    InvalidReleaseType,
+    MissingReleaseType,
+    ReleaseFileEmpty,
+    ReleaseFileNotFound,
+    ReleaseNoteInvalid,
+)
 
 
 @pytest.fixture
@@ -67,8 +75,9 @@ def test_fails_if_release_type_is_not_valid(temporary_working_directory):
         autopub.check()
 
 
-
-def test_can_using_plugins_to_add_additional_validation(temporary_working_directory, valid_release_text: str):
+def test_can_using_plugins_to_add_additional_validation(
+    temporary_working_directory, valid_release_text: str
+):
     class MissingRocket(AutopubException):
         message = "Missing rocket"
 
