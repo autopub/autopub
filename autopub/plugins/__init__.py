@@ -1,0 +1,20 @@
+from typing_extensions import Protocol, runtime_checkable
+
+from autopub.exceptions import AutopubException
+
+
+class AutopubPlugin:
+    def validate_release_notes(self, release_notes: str):
+        ...
+
+    def on_release_notes_valid(self, release_notes: str):
+        ...
+
+    def on_release_notes_invalid(self, exception: AutopubException):
+        ...
+
+
+@runtime_checkable
+class AutopubPackageManagerPlugin(Protocol):
+    def build(self) -> None:
+        ...

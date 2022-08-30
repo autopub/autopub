@@ -1,20 +1,30 @@
+from typing import List, TypedDict
+
 import typer
 
 import rich
 from rich.panel import Panel
 
 from autopub import Autopub
+from autopub.cli.plugins import find_plugins
 from autopub.exceptions import AutopubException
 
 
 app = typer.Typer()
 
 
+class State(TypedDict):
+    plugins: List[str]
+
+
+state: State = {"plugins": []}
+
+
 @app.command()
 def check():
     """This commands checks if the current PR has a valid release file."""
 
-    autopub = Autopub()
+    autopub = Autopub(plugins=find_plugins(state["plugins"]))
 
     try:
         autopub.check()
@@ -28,7 +38,16 @@ def check():
 
 @app.command()
 def build():
-    print("building")
+    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+
+    try:
+        autopub.build()
+    except AutopubException as e:
+        rich.print(Panel.fit(f"[red]{e.message}"))
+
+        raise typer.Exit(1) from e
+    else:
+        rich.print(Panel.fit("[green]Build succeeded"))
 
 
 @app.command()
@@ -39,3 +58,15 @@ def publish():
     3. push on pypi or similar
     """
     print("publishing")
+
+
+@app.callback()
+def main(
+    plugins: List[str] = typer.Option(
+        [],
+        "--plugin",
+        "-p",
+        help="List of plugins to use",
+    )
+):
+    state["plugins"] = plugins

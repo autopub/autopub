@@ -5,21 +5,12 @@ from .exceptions import (
     AutopubException,
     InvalidReleaseType,
     MissingReleaseType,
+    NoPackageManagerPluginFound,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
     ReleaseNoteInvalid,
 )
-
-
-class AutopubPlugin:
-    def validate_release_notes(self, release_notes: str):
-        ...
-
-    def on_release_notes_valid(self, release_notes: str):
-        ...
-
-    def on_release_notes_invalid(self, exception: AutopubException):
-        ...
+from .plugins import AutopubPackageManagerPlugin, AutopubPlugin
 
 
 class Autopub:
@@ -45,6 +36,16 @@ class Autopub:
 
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_notes)
+
+    def build(self) -> None:
+        if not any(
+            isinstance(plugin, AutopubPackageManagerPlugin) for plugin in self.plugins
+        ):
+            raise NoPackageManagerPluginFound()
+
+        for plugin in self.plugins:
+            if isinstance(plugin, AutopubPackageManagerPlugin):
+                plugin.build()
 
     def _validate_release_notes(self, release_notes: str) -> Tuple[str, str]:
         if not release_notes:

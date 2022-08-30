@@ -1,6 +1,9 @@
 class AutopubException(Exception):
     message: str
 
+    def __init__(self) -> None:
+        super().__init__(self.message)
+
 
 class ReleaseFileNotFound(AutopubException):
     message = "Release file not found"
@@ -21,3 +24,8 @@ class MissingReleaseType(AutopubException):
 class InvalidReleaseType(AutopubException):
     def __init__(self, release_type: str):
         self.message = f"Release type {release_type} is invalid"
+        super().__init__()
+
+
+class NoPackageManagerPluginFound(AutopubException):
+    message = "No package manager plugin found"
