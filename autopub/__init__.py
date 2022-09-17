@@ -6,12 +6,12 @@ import frontmatter  # type: ignore
 
 from .exceptions import (
     AutopubException,
-    InvalidReleaseType,
-    MissingReleaseType,
     NoPackageManagerPluginFound,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
     ReleaseNotesEmpty,
+    ReleaseTypeInvalid,
+    ReleaseTypeMissing,
 )
 from .plugins import AutopubPackageManagerPlugin, AutopubPlugin
 from .types import ReleaseInfo
@@ -32,7 +32,7 @@ class Autopub:
         content = release_file.read_text()
 
         try:
-            release_info  = self._validate_release_notes(content)
+            release_info = self._validate_release_notes(content)
         except AutopubException as e:
             for plugin in self.plugins:
                 plugin.on_release_notes_invalid(e)
@@ -63,16 +63,18 @@ class Autopub:
         try:
             release_info, release_notes = release_notes.split("\n", 1)
         except ValueError as e:
-            raise MissingReleaseType() from e
+            raise ReleaseTypeMissing() from e
 
         release_info = release_info.lower()
 
         if not release_info.startswith("release type:"):
-            raise MissingReleaseType()
+            raise ReleaseTypeMissing()
 
         release_type = release_info.split(":", 1)[1].strip().lower()
 
-        return ReleaseInfo(release_type=release_type, release_notes=release_notes.strip())
+        return ReleaseInfo(
+            release_type=release_type, release_notes=release_notes.strip()
+        )
 
     def _load_from_frontmatter(self, release_notes: str) -> ReleaseInfo:
         # supports loading of new release notes format, which looks like this:
@@ -88,7 +90,7 @@ class Autopub:
         release_type = data.pop("release type").lower()
 
         if release_type not in ("major", "minor", "patch"):
-            raise InvalidReleaseType(release_type)
+            raise ReleaseTypeInvalid(release_type)
 
         if post.content.strip() == "":
             raise ReleaseNotesEmpty()
@@ -104,7 +106,7 @@ class Autopub:
             raise ReleaseFileEmpty()
 
         try:
-            release_info =  self._load_from_frontmatter(release_notes)
+            release_info = self._load_from_frontmatter(release_notes)
         except KeyError:
             release_info = self._deprecated_load(release_notes)
 

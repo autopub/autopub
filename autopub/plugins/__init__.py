@@ -1,7 +1,6 @@
 from typing_extensions import Protocol, runtime_checkable
 
 from autopub.exceptions import AutopubException
-
 from autopub.types import ReleaseInfo
 
 

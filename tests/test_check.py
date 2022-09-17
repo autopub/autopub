@@ -8,11 +8,11 @@ import pytest
 from autopub import Autopub, AutopubPlugin
 from autopub.exceptions import (
     AutopubException,
-    InvalidReleaseType,
-    MissingReleaseType,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
     ReleaseNotesEmpty,
+    ReleaseTypeInvalid,
+    ReleaseTypeMissing,
 )
 from autopub.types import ReleaseInfo
 
@@ -50,7 +50,10 @@ def test_fails_if_release_text_is_empty(temporary_working_directory: str):
     with pytest.raises(ReleaseFileEmpty):
         autopub.check()
 
-def test_fails_if_release_notes_is_empty(temporary_working_directory: str, missing_release_notes_text: str):
+
+def test_fails_if_release_notes_is_empty(
+    temporary_working_directory: str, missing_release_notes_text: str
+):
     release_file = Path(temporary_working_directory) / "RELEASE.md"
     release_file.write_text(missing_release_notes_text)
 
@@ -60,28 +63,34 @@ def test_fails_if_release_notes_is_empty(temporary_working_directory: str, missi
         autopub.check()
 
 
-def test_fails_if_release_file_is_missing_release_type(temporary_working_directory: str):
+def test_fails_if_release_file_is_missing_release_type(
+    temporary_working_directory: str,
+):
     release_file = Path(temporary_working_directory) / "RELEASE.md"
     release_file.write_text("Example \nThis is not a valid release note")
 
     autopub = Autopub()
 
-    with pytest.raises(MissingReleaseType):
+    with pytest.raises(ReleaseTypeMissing):
         autopub.check()
 
 
 def test_fails_if_release_type_is_not_valid(temporary_working_directory: str):
     release_file = Path(temporary_working_directory) / "RELEASE.md"
-    release_file.write_text(textwrap.dedent("""
+    release_file.write_text(
+        textwrap.dedent(
+            """
         ---
         release type: butter
         ---
         This is not a valid release note
-    """).strip())
+    """
+        ).strip()
+    )
 
     autopub = Autopub()
 
-    with pytest.raises(InvalidReleaseType):
+    with pytest.raises(ReleaseTypeInvalid):
         autopub.check()
 
 
@@ -109,7 +118,7 @@ def test_can_using_plugins_to_add_additional_validation(
 
 
 def test_runs_plugin_when_ok(temporary_working_directory: str, valid_release_text: str):
-    release_info_value : Optional[ ReleaseInfo] = None
+    release_info_value: Optional[ReleaseInfo] = None
 
     class MyPlugin(AutopubPlugin):
         def on_release_notes_valid(self, release_info: ReleaseInfo):
@@ -142,13 +151,15 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory: str):
     release_file = Path(temporary_working_directory) / "RELEASE.md"
     release_file.write_text("Get a 🚀")
 
-    with contextlib.suppress(MissingReleaseType):
+    with contextlib.suppress(ReleaseTypeMissing):
         autopub.check()
 
     assert "Release note is missing release type" == error_value
 
 
-def test_supports_old_format(temporary_working_directory: str, deprecated_release_text: str):
+def test_supports_old_format(
+    temporary_working_directory: str, deprecated_release_text: str
+):
     # with pytest.warns(UserWarning):
 
     release_file = Path(temporary_working_directory) / "RELEASE.md"
