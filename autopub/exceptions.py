@@ -13,8 +13,8 @@ class ReleaseFileEmpty(AutopubException):
     message = "Release file is empty"
 
 
-class ReleaseNoteInvalid(AutopubException):
-    message = "Release note is invalid"
+class ReleaseNotesEmpty(AutopubException):
+    message = "Release notes are empty"
 
 
 class MissingReleaseType(AutopubException):

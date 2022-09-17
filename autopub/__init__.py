@@ -11,7 +11,7 @@ from .exceptions import (
     NoPackageManagerPluginFound,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
-    ReleaseNoteInvalid,
+    ReleaseNotesEmpty,
 )
 from .plugins import AutopubPackageManagerPlugin, AutopubPlugin
 from .types import ReleaseInfo
@@ -81,7 +81,6 @@ class Autopub:
         # ---
         # release notes here.
 
-        # TODO: check for invalid frontmatter
         post = frontmatter.loads(release_notes)
 
         data: dict[str, str] = post.to_dict()
@@ -90,6 +89,9 @@ class Autopub:
 
         if release_type not in ("major", "minor", "patch"):
             raise InvalidReleaseType(release_type)
+
+        if post.content.strip() == "":
+            raise ReleaseNotesEmpty()
 
         return ReleaseInfo(
             release_type=release_type,
@@ -100,8 +102,6 @@ class Autopub:
     def _validate_release_notes(self, release_notes: str) -> ReleaseInfo:
         if not release_notes:
             raise ReleaseFileEmpty()
-
-        additional_info = frontmatter.loads(release_notes)
 
         try:
             release_info =  self._load_from_frontmatter(release_notes)

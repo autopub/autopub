@@ -12,7 +12,7 @@ from autopub.exceptions import (
     MissingReleaseType,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
-    ReleaseNoteInvalid,
+    ReleaseNotesEmpty,
 )
 from autopub.types import ReleaseInfo
 
@@ -41,13 +41,22 @@ def test_works(temporary_working_directory: str, valid_release_text: str):
     assert release_info.release_notes == "This is a new release."
 
 
-def test_fails_if_release_note_is_empty(temporary_working_directory: str):
+def test_fails_if_release_text_is_empty(temporary_working_directory: str):
     release_file = Path(temporary_working_directory) / "RELEASE.md"
     release_file.write_text("")
 
     autopub = Autopub()
 
     with pytest.raises(ReleaseFileEmpty):
+        autopub.check()
+
+def test_fails_if_release_notes_is_empty(temporary_working_directory: str, missing_release_notes_text: str):
+    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file.write_text(missing_release_notes_text)
+
+    autopub = Autopub()
+
+    with pytest.raises(ReleaseNotesEmpty):
         autopub.check()
 
 
