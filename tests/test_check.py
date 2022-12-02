@@ -19,20 +19,20 @@ from autopub.types import ReleaseInfo
 
 
 @pytest.fixture
-def temporary_working_directory(tmpdir: Any) -> Generator[str, None, None]:
+def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
     with tmpdir.as_cwd():
-        yield tmpdir
+        yield Path(tmpdir)
 
 
-def test_check_fails_if_no_release_file_is_present(temporary_working_directory: str):
+def test_check_fails_if_no_release_file_is_present(temporary_working_directory: Path):
     autopub = Autopub()
 
     with pytest.raises(ReleaseFileNotFound):
         autopub.check()
 
 
-def test_works(temporary_working_directory: str, valid_release_text: str):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+def test_works(temporary_working_directory: Path, valid_release_text: str):
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
     autopub = Autopub()
@@ -42,8 +42,8 @@ def test_works(temporary_working_directory: str, valid_release_text: str):
     assert release_info.release_notes == "This is a new release."
 
 
-def test_fails_if_release_text_is_empty(temporary_working_directory: str):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+def test_fails_if_release_text_is_empty(temporary_working_directory: Path):
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text("")
 
     autopub = Autopub()
@@ -53,9 +53,9 @@ def test_fails_if_release_text_is_empty(temporary_working_directory: str):
 
 
 def test_fails_if_release_notes_is_empty(
-    temporary_working_directory: str, missing_release_notes_text: str
+    temporary_working_directory: Path, missing_release_notes_text: str
 ):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(missing_release_notes_text)
 
     autopub = Autopub()
@@ -65,9 +65,9 @@ def test_fails_if_release_notes_is_empty(
 
 
 def test_fails_if_release_file_is_missing_release_type(
-    temporary_working_directory: str,
+    temporary_working_directory: Path,
 ):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text("Example \nThis is not a valid release note")
 
     autopub = Autopub()
@@ -76,8 +76,8 @@ def test_fails_if_release_file_is_missing_release_type(
         autopub.check()
 
 
-def test_fails_if_release_type_is_not_valid(temporary_working_directory: str):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+def test_fails_if_release_type_is_not_valid(temporary_working_directory: Path):
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(
         textwrap.dedent(
             """
@@ -96,7 +96,7 @@ def test_fails_if_release_type_is_not_valid(temporary_working_directory: str):
 
 
 def test_can_using_plugins_to_add_additional_validation(
-    temporary_working_directory: str, valid_release_text: str
+    temporary_working_directory: Path, valid_release_text: str
 ):
     class MissingRocket(AutopubException):
         message = "Missing rocket"
@@ -111,14 +111,16 @@ def test_can_using_plugins_to_add_additional_validation(
 
     autopub = Autopub(plugins=[MyValidationPlugin])
 
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
     with pytest.raises(MissingRocket):
         autopub.check()
 
 
-def test_runs_plugin_when_ok(temporary_working_directory: str, valid_release_text: str):
+def test_runs_plugin_when_ok(
+    temporary_working_directory: Path, valid_release_text: str
+):
     release_info_value: Optional[ReleaseInfo] = None
 
     class MyPlugin(AutopubPlugin):
@@ -129,7 +131,7 @@ def test_runs_plugin_when_ok(temporary_working_directory: str, valid_release_tex
 
     autopub = Autopub(plugins=[MyPlugin])
 
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
     autopub.check()
@@ -138,7 +140,7 @@ def test_runs_plugin_when_ok(temporary_working_directory: str, valid_release_tex
     assert release_info_value.release_notes == "This is a new release."
 
 
-def test_runs_plugin_when_something_is_wrong(temporary_working_directory: str):
+def test_runs_plugin_when_something_is_wrong(temporary_working_directory: Path):
     error_value = ""
 
     class MyPlugin(AutopubPlugin):
@@ -149,7 +151,7 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory: str):
 
     autopub = Autopub(plugins=[MyPlugin])
 
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text("Get a 🚀")
 
     with contextlib.suppress(ReleaseTypeMissing):
@@ -159,9 +161,9 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory: str):
 
 
 def test_supports_old_format(
-    temporary_working_directory: str, deprecated_release_text: str
+    temporary_working_directory: Path, deprecated_release_text: str
 ):
-    release_file = Path(temporary_working_directory) / "RELEASE.md"
+    release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(deprecated_release_text)
 
     autopub = Autopub()
@@ -172,9 +174,9 @@ def test_supports_old_format(
 
 
 def test_check_creates_an_artifact(
-    temporary_working_directory: str, valid_release_text: str
+    temporary_working_directory: Path, valid_release_text: str
 ):
-    working_dir = Path(temporary_working_directory)
+    working_dir = temporary_working_directory
     release_file = working_dir / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
@@ -191,4 +193,40 @@ def test_check_creates_an_artifact(
         "hash": "2081c77abe0980abd6474bdec5d21afceedb7726d6e0c9af3a14d9f24587a268",
         "release_type": "patch",
         "release_notes": "This is a new release.",
+        "plugin_data": {},
+    }
+
+
+def test_check_with_plugins_adds_data_to_artifact(temporary_working_directory: Path):
+    release_file = temporary_working_directory / "RELEASE.md"
+    release_file.write_text(
+        textwrap.dedent(
+            """
+            ---
+            release type: patch
+            tweet: This is a new release 🙌
+            ---
+            Valid release notes
+            """
+        ).strip()
+    )
+
+    class TweetPlugin(AutopubPlugin):
+        def validate_release_notes(self, release_info: ReleaseInfo):
+            self.data["tweet"] = release_info.additional_info["tweet"]
+
+    autopub = Autopub(plugins=[TweetPlugin])
+    autopub.check()
+
+    artifact = temporary_working_directory / ".autopub" / "release_data.json"
+
+    assert artifact.exists()
+
+    release_data = json.loads(artifact.read_text())
+
+    assert release_data == {
+        "hash": "e866f4cbbf0dbbebee9180395a85dbaeb92eda5890662408fa6a4d47551910e4",
+        "release_type": "patch",
+        "release_notes": "Valid release notes",
+        "plugin_data": {"tweet": "This is a new release 🙌"},
     }

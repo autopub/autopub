@@ -43,18 +43,7 @@ class Autopub:
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 
-        # create .autopub/release_data.json
-        release_data_file = Path(".autopub") / "release_data.json"
-        release_data_file.parent.mkdir(exist_ok=True)
-        release_data_file.write_text(
-            json.dumps(
-                {
-                    "hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
-                    "release_type": release_info.release_type,
-                    "release_notes": release_info.release_notes,
-                }
-            )
-        )
+        self._write_artifact(content, release_info)
 
         return release_info
 
@@ -67,6 +56,22 @@ class Autopub:
         for plugin in self.plugins:
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.build()
+
+    def _write_artifact(self, content: str, release_info: ReleaseInfo) -> None:
+        data = {
+            "hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+            "release_type": release_info.release_type,
+            "release_notes": release_info.release_notes,
+            "plugin_data": {
+                key: value
+                for plugin in self.plugins
+                for key, value in plugin.data.items()
+            },
+        }
+
+        release_data_file = Path(".autopub") / "release_data.json"
+        release_data_file.parent.mkdir(exist_ok=True)
+        release_data_file.write_text(json.dumps(data))
 
     def _deprecated_load(self, release_notes: str) -> ReleaseInfo:
         # supports loading of old release notes format, which is
