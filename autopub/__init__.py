@@ -7,6 +7,7 @@ from typing import Iterable, Type
 import frontmatter  # type: ignore
 
 from autopub.exceptions import (
+    ArtifactHashMismatch,
     ArtifactNotFound,
     AutopubException,
     NoPackageManagerPluginFound,
@@ -26,16 +27,26 @@ class Autopub:
     def __init__(self, plugins: Iterable[Type[AutopubPlugin]] = ()) -> None:
         self.plugins = [plugin_class() for plugin_class in plugins]
 
+    @property
+    def release_file(self) -> Path:
+        return Path.cwd() / self.RELEASE_FILE_PATH
+
+    @property
+    def release_notes(self) -> str:
+        return self.release_file.read_text()
+
+    @property
+    def release_file_hash(self) -> str:
+        return hashlib.sha256(self.release_notes.encode("utf-8")).hexdigest()
+
     def check(self) -> ReleaseInfo:
         release_file = Path(self.RELEASE_FILE_PATH)
 
         if not release_file.exists():
             raise ReleaseFileNotFound()
 
-        content = release_file.read_text()
-
         try:
-            release_info = self._validate_release_notes(content)
+            release_info = self._validate_release_notes(self.release_notes)
         except AutopubException as e:
             for plugin in self.plugins:
                 plugin.on_release_notes_invalid(e)
@@ -44,7 +55,7 @@ class Autopub:
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 
-        self._write_artifact(content, release_info)
+        self._write_artifact(release_info)
 
         return release_info
 
@@ -65,9 +76,16 @@ class Autopub:
         if not release_data_file.exists():
             raise ArtifactNotFound()
 
-    def _write_artifact(self, content: str, release_info: ReleaseInfo) -> None:
+        release_data = json.loads(release_data_file.read_text())
+
+        if release_data["hash"] != self.release_file_hash:
+            raise ArtifactHashMismatch()
+
+        ...
+
+    def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {
-            "hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+            "hash": self.release_file_hash,
             "release_type": release_info.release_type,
             "release_notes": release_info.release_notes,
             "plugin_data": {

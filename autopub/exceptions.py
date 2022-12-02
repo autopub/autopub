@@ -33,3 +33,7 @@ class NoPackageManagerPluginFound(AutopubException):
 
 class ArtifactNotFound(AutopubException):
     message = "Artifact not found, did you run `autopub check`?"
+
+
+class ArtifactHashMismatch(AutopubException):
+    message = "Artifact hash mismatch, did you run `autopub check`?"
