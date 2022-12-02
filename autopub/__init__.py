@@ -1,10 +1,11 @@
+import json
 from pathlib import Path
 from typing import Iterable, Type
 
 # TODO: add stubs
 import frontmatter  # type: ignore
 
-from .exceptions import (
+from autopub.exceptions import (
     AutopubException,
     NoPackageManagerPluginFound,
     ReleaseFileEmpty,
@@ -13,8 +14,8 @@ from .exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
-from .plugins import AutopubPackageManagerPlugin, AutopubPlugin
-from .types import ReleaseInfo
+from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
+from autopub.types import ReleaseInfo
 
 
 class Autopub:
@@ -40,6 +41,18 @@ class Autopub:
 
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
+
+        # create .autopub/release_data.json
+        release_data_file = Path(".autopub") / "release_data.json"
+        release_data_file.parent.mkdir(exist_ok=True)
+        release_data_file.write_text(
+            json.dumps(
+                {
+                    "release_type": release_info.release_type,
+                    "release_notes": release_info.release_notes,
+                }
+            )
+        )
 
         return release_info
 

@@ -1,4 +1,5 @@
 import contextlib
+import json
 import textwrap
 from pathlib import Path
 from typing import Any, Generator, Optional
@@ -160,8 +161,6 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory: str):
 def test_supports_old_format(
     temporary_working_directory: str, deprecated_release_text: str
 ):
-    # with pytest.warns(UserWarning):
-
     release_file = Path(temporary_working_directory) / "RELEASE.md"
     release_file.write_text(deprecated_release_text)
 
@@ -170,3 +169,25 @@ def test_supports_old_format(
 
     assert release_info.release_type == "patch"
     assert release_info.release_notes == "This is a new release."
+
+
+def test_check_creates_an_artifact(
+    temporary_working_directory: str, valid_release_text: str
+):
+    working_dir = Path(temporary_working_directory)
+    release_file = working_dir / "RELEASE.md"
+    release_file.write_text(valid_release_text)
+
+    autopub = Autopub()
+    autopub.check()
+
+    artifact = working_dir / ".autopub" / "release_data.json"
+
+    assert artifact.exists()
+
+    release_data = json.loads(artifact.read_text())
+
+    assert release_data == {
+        "release_type": "patch",
+        "release_notes": "This is a new release.",
+    }
