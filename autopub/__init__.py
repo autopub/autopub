@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 from typing import Iterable, Type
@@ -48,6 +49,7 @@ class Autopub:
         release_data_file.write_text(
             json.dumps(
                 {
+                    "hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
                     "release_type": release_info.release_type,
                     "release_notes": release_info.release_notes,
                 }

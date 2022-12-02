@@ -188,6 +188,7 @@ def test_check_creates_an_artifact(
     release_data = json.loads(artifact.read_text())
 
     assert release_data == {
+        "hash": "2081c77abe0980abd6474bdec5d21afceedb7726d6e0c9af3a14d9f24587a268",
         "release_type": "patch",
         "release_notes": "This is a new release.",
     }
