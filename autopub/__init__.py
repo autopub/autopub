@@ -7,6 +7,7 @@ from typing import Iterable, Type
 import frontmatter  # type: ignore
 
 from autopub.exceptions import (
+    ArtifactNotFound,
     AutopubException,
     NoPackageManagerPluginFound,
     ReleaseFileEmpty,
@@ -56,6 +57,13 @@ class Autopub:
         for plugin in self.plugins:
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.build()
+
+    def publish(self) -> None:
+        # TODO: move this to a property and reuse it below
+        release_data_file = Path(".autopub") / "release_data.json"
+
+        if not release_data_file.exists():
+            raise ArtifactNotFound()
 
     def _write_artifact(self, content: str, release_info: ReleaseInfo) -> None:
         data = {

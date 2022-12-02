@@ -29,3 +29,7 @@ class ReleaseTypeInvalid(AutopubException):
 
 class NoPackageManagerPluginFound(AutopubException):
     message = "No package manager plugin found"
+
+
+class ArtifactNotFound(AutopubException):
+    message = "Artifact not found, did you run `autopub check`?"
