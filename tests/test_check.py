@@ -2,7 +2,7 @@ import contextlib
 import json
 import textwrap
 from pathlib import Path
-from typing import Any, Generator, Optional
+from typing import Optional
 
 import pytest
 
@@ -16,12 +16,6 @@ from autopub.exceptions import (
     ReleaseTypeMissing,
 )
 from autopub.types import ReleaseInfo
-
-
-@pytest.fixture
-def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
-    with tmpdir.as_cwd():
-        yield Path(tmpdir)
 
 
 def test_check_fails_if_no_release_file_is_present(temporary_working_directory: Path):

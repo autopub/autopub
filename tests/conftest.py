@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Any, Generator
+
 import pytest
 
 
@@ -35,3 +38,9 @@ def missing_release_notes_text() -> str:
 @pytest.fixture
 def deprecated_release_text() -> str:
     return DEPRECATED_RELEASE_TEXT.strip()
+
+
+@pytest.fixture
+def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
+    with tmpdir.as_cwd():
+        yield Path(tmpdir)

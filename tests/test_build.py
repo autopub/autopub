@@ -5,12 +5,6 @@ from autopub.exceptions import NoPackageManagerPluginFound
 from autopub.plugins import AutopubPlugin
 
 
-@pytest.fixture
-def temporary_working_directory(tmpdir):
-    with tmpdir.as_cwd():
-        yield tmpdir
-
-
 def test_fails_without_any_build_plugin():
     autopub = Autopub()
 
