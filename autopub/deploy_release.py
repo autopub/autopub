@@ -8,6 +8,7 @@ from create_github_release import create_github_release
 from commit_release import git_commit_and_push
 from prepare_release import prepare_release
 from publish_release import publish_release
+from plugins.trigger import trigger_after_release
 
 
 def deploy_release():
@@ -16,3 +17,4 @@ def deploy_release():
     git_commit_and_push()
     create_github_release()
     publish_release()
+    trigger_after_release()
