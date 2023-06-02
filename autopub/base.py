@@ -89,14 +89,6 @@ TAG_PREFIX = dict_get(config, ["tool", "autopub", "tag-prefix"], default="")
 
 PYPI_URL = dict_get(config, ["tool", "autopub", "pypi-url"])
 
-BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
-if not BUILD_SYSTEM:
-    build_backend = dict_get(config, ["build-system", "build-backend"])
-    if "poetry" in build_backend:
-        BUILD_SYSTEM = "poetry"
-    elif "setuptools" in build_backend:
-        BUILD_SYSTEM = "setuptools"
-
 # Git configuration
 
 GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
@@ -113,7 +105,11 @@ APPEND_GITHUB_CONTRIBUTOR = dict_get(
 def run_process(popenargs, encoding="utf-8", env=None):
     if env is not None:
         env = {**os.environ, **env}
-    return subprocess.check_output(popenargs, encoding=encoding, env=env).strip()
+    try:
+        return subprocess.check_output(popenargs, encoding=encoding, env=env).strip()
+    except subprocess.CalledProcessError as e:
+        print(e.output, file=sys.stderr)
+        sys.exit(1)
 
 
 def git(popenargs):
@@ -126,10 +122,12 @@ def check_exit_code(popenargs):
 
 
 def get_project_version():
-    # Explicitly handle poetry and follow standards otherwise
-    if BUILD_SYSTEM == "poetry":
-        return dict_get(config, ["tool", "poetry", "version"])
-    return dict_get(config, ["project", "version"])
+    # Backwards compat: Try poetry first and then fall "back" to standards
+    version = dict_get(config, ["tool", "poetry", "version"])
+    if version is None:
+        return dict_get(config, ["project", "version"])
+    else:
+        return version
 
 
 def get_release_info():

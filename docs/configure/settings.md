@@ -43,8 +43,4 @@ Configuration settings are read from the `[tool.autopub]` section of the project
 `pypi-url`
 :  Publish packages to this PyPI URL, used for Setuptools builds only (`""`)
 
-`build-system`
-:  Specify whether `poetry` or `setuptools` will be used for project builds (`build-system.requires`)
-
-
 [`pyproject.toml`]: https://www.python.org/dev/peps/pep-0518/#specification
