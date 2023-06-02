@@ -17,7 +17,7 @@ Configuration settings are read from the `[tool.autopub]` section of the project
 **The following configuration settings are optional, with default values shown in parentheses:**
 
 `project-name`
-:  The name of the project. (`tool.poetry.name`)
+:  The name of the project. (`tool.poetry.name` or `project.name`)
 
 `append-github-contributor`
 :  Append GitHub PR contributor’s name to the changelog entry. (`False`)

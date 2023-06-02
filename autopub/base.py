@@ -62,6 +62,8 @@ PROJECT_NAME = dict_get(config, ["tool", "autopub", "project-name"])
 if not PROJECT_NAME:
     PROJECT_NAME = dict_get(config, ["tool", "poetry", "name"])
 if not PROJECT_NAME:
+    PROJECT_NAME = dict_get(config, ["project", "name"])
+if not PROJECT_NAME:
     print(
         "Could not determine project name. Under the pyproject file's "
         '[tool.autopub] header, add:\nproject-name = "YourProjectName"'
