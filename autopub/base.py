@@ -91,10 +91,10 @@ PYPI_URL = dict_get(config, ["tool", "autopub", "pypi-url"])
 
 BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
 if not BUILD_SYSTEM:
-    build_requires = dict_get(config, ["build-system", "requires"])
-    if "poetry" in build_requires:
+    build_backend = dict_get(config, ["build-system", "build-backend"])
+    if "poetry" in build_backend:
         BUILD_SYSTEM = "poetry"
-    elif "setuptools" in build_requires:
+    elif "setuptools" in build_backend:
         BUILD_SYSTEM = "setuptools"
 
 # Git configuration
@@ -126,16 +126,10 @@ def check_exit_code(popenargs):
 
 
 def get_project_version():
-    VERSION_REGEX = re.compile(r"^version\s*=\s*\"(?P<version>\d+\.\d+\.\d+)\"$")
-
-    with open(PYPROJECT_FILE) as f:
-        for line in f:
-            match = VERSION_REGEX.match(line)
-
-            if match:
-                return match.group("version")
-
-    return None
+    # Explicitly handle poetry and follow standards otherwise
+    if BUILD_SYSTEM == "poetry":
+        return dict_get(config, ["tool", "poetry", "version"])
+    return dict_get(config, ["project", "version"])
 
 
 def get_release_info():
