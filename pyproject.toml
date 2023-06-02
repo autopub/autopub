@@ -28,6 +28,7 @@ githubrelease = {version = "^1.5.8", optional = true}
 httpx = {version = "=0.16.1", optional = true}
 build = "^0.10.0"
 twine = "^4.0.2"
+dunamai = "^1.17.0"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
