@@ -24,7 +24,7 @@ if os.environ.get("CIRCLECI"):
     CIRCLE_PROJECT_USERNAME = os.environ.get("CIRCLE_PROJECT_USERNAME")
     CIRCLE_PROJECT_REPONAME = os.environ.get("CIRCLE_PROJECT_REPONAME")
     REPO_SLUG = f"{CIRCLE_PROJECT_USERNAME}/{CIRCLE_PROJECT_REPONAME}"
-elif os.environ.get("GITHUB_WORKFLOW"):
+elif os.environ.get("GITHUB_ACTIONS") == "true":
     CI_SYSTEM = "github"
     REPO_SLUG = os.environ.get("GITHUB_REPOSITORY")
 elif os.environ.get("TRAVIS"):
