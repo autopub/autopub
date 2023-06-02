@@ -3,13 +3,12 @@ import sys
 
 sys.path.append(os.path.dirname(__file__))  # noqa
 
-from base import BUILD_SYSTEM, run_process
-
-if BUILD_SYSTEM == "poetry":
-    build_cmd = ["poetry", "build"]
-else:
-    build_cmd = ["python", "setup.py", "sdist", "bdist_wheel"]
+from base import git, run_process
 
 
 def build_release():
-    run_process(build_cmd)
+    env = None
+    if "SOURCE_DATE_EPOCH" not in os.environ:
+        ctime = git(["log", "-1", "--pretty=%ct"]).decode().strip()
+        env = {"SOURCE_DATE_EPOCH": ctime}
+    run_process([sys.executable, "-m", "build"], env=env)

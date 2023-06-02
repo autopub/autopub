@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 import sys
-
 from pathlib import Path
+
 from tomlkit import parse
 
 
@@ -110,8 +110,10 @@ APPEND_GITHUB_CONTRIBUTOR = dict_get(
 )
 
 
-def run_process(popenargs, encoding="utf-8"):
-    return subprocess.check_output(popenargs).decode(encoding).strip()
+def run_process(popenargs, encoding="utf-8", env=None):
+    if env is not None:
+        env = {**os.environ, **env}
+    return subprocess.check_output(popenargs, encoding=encoding, env=env).strip()
 
 
 def git(popenargs):

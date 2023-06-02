@@ -22,10 +22,11 @@ classifiers = [
 "Issue Tracker" = "https://github.com/autopub/autopub/issues"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.8", optional = true}
 httpx = {version = "=0.16.1", optional = true}
+build = "^0.10.0"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
