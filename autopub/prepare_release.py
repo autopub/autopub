@@ -6,17 +6,20 @@ sys.path.append(os.path.dirname(__file__))  # noqa
 
 from datetime import datetime
 
+import tomlkit
 from base import (
-    configure_git,
-    get_release_info,
-    run_process,
     CHANGELOG_FILE,
     CHANGELOG_HEADER,
+    PYPROJECT_FILE,
     ROOT,
     VERSION_HEADER,
     VERSION_STRINGS,
+    configure_git,
+    dict_get,
+    get_project_version,
+    get_release_info,
 )
-
+from dunamai import Version
 from github_contributor import append_github_contributor
 
 
@@ -38,20 +41,22 @@ def update_version_strings(file_path, new_version):
 def prepare_release():
     configure_git()
 
-    POETRY_DUMP_VERSION_OUTPUT = re.compile(
-        r"Bumping version from \d+\.\d+\.\d+ to (?P<version>\d+\.\d+\.\d+)"
-    )
-
     type_, release_changelog = get_release_info()
 
-    output = run_process(["poetry", "version", type_])
-    version_match = POETRY_DUMP_VERSION_OUTPUT.match(output)
+    version = Version(get_project_version())
+    new_version = version.bump({"major": 0, "minor": 1, "patch": 2}[type_]).serialize()
 
-    if not version_match:
-        print("Unable to bump the project version using Poetry")
-        sys.exit(1)
+    with open(PYPROJECT_FILE, "r") as f:
+        config = tomlkit.load(f)
 
-    new_version = version_match.group("version")
+    poetry = dict_get(config, ["tool", "poetry", "version"])
+    if poetry:
+        config["tool"]["poetry"]["version"] = new_version
+    else:
+        config["project"]["version"] = new_version
+
+    with open(PYPROJECT_FILE, "w") as f:
+        config = tomlkit.dump(config, f)
 
     if VERSION_STRINGS:
         for version_file in VERSION_STRINGS:

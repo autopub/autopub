@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 import sys
-
 from pathlib import Path
+
 from tomlkit import parse
 
 
@@ -24,7 +24,7 @@ if os.environ.get("CIRCLECI"):
     CIRCLE_PROJECT_USERNAME = os.environ.get("CIRCLE_PROJECT_USERNAME")
     CIRCLE_PROJECT_REPONAME = os.environ.get("CIRCLE_PROJECT_REPONAME")
     REPO_SLUG = f"{CIRCLE_PROJECT_USERNAME}/{CIRCLE_PROJECT_REPONAME}"
-elif os.environ.get("GITHUB_WORKFLOW"):
+elif os.environ.get("GITHUB_ACTIONS") == "true":
     CI_SYSTEM = "github"
     REPO_SLUG = os.environ.get("GITHUB_REPOSITORY")
 elif os.environ.get("TRAVIS"):
@@ -62,6 +62,8 @@ PROJECT_NAME = dict_get(config, ["tool", "autopub", "project-name"])
 if not PROJECT_NAME:
     PROJECT_NAME = dict_get(config, ["tool", "poetry", "name"])
 if not PROJECT_NAME:
+    PROJECT_NAME = dict_get(config, ["project", "name"])
+if not PROJECT_NAME:
     print(
         "Could not determine project name. Under the pyproject file's "
         '[tool.autopub] header, add:\nproject-name = "YourProjectName"'
@@ -89,14 +91,6 @@ TAG_PREFIX = dict_get(config, ["tool", "autopub", "tag-prefix"], default="")
 
 PYPI_URL = dict_get(config, ["tool", "autopub", "pypi-url"])
 
-BUILD_SYSTEM = dict_get(config, ["tool", "autopub", "build-system"])
-if not BUILD_SYSTEM:
-    build_requires = dict_get(config, ["build-system", "requires"])
-    if "poetry" in build_requires:
-        BUILD_SYSTEM = "poetry"
-    elif "setuptools" in build_requires:
-        BUILD_SYSTEM = "setuptools"
-
 # Git configuration
 
 GIT_USERNAME = dict_get(config, ["tool", "autopub", "git-username"])
@@ -110,8 +104,14 @@ APPEND_GITHUB_CONTRIBUTOR = dict_get(
 )
 
 
-def run_process(popenargs, encoding="utf-8"):
-    return subprocess.check_output(popenargs).decode(encoding).strip()
+def run_process(popenargs, encoding="utf-8", env=None):
+    if env is not None:
+        env = {**os.environ, **env}
+    try:
+        return subprocess.check_output(popenargs, encoding=encoding, env=env).strip()
+    except subprocess.CalledProcessError as e:
+        print(e.output, file=sys.stderr)
+        sys.exit(1)
 
 
 def git(popenargs):
@@ -124,16 +124,12 @@ def check_exit_code(popenargs):
 
 
 def get_project_version():
-    VERSION_REGEX = re.compile(r"^version\s*=\s*\"(?P<version>\d+\.\d+\.\d+)\"$")
-
-    with open(PYPROJECT_FILE) as f:
-        for line in f:
-            match = VERSION_REGEX.match(line)
-
-            if match:
-                return match.group("version")
-
-    return None
+    # Backwards compat: Try poetry first and then fall "back" to standards
+    version = dict_get(config, ["tool", "poetry", "version"])
+    if version is None:
+        return dict_get(config, ["project", "version"])
+    else:
+        return version
 
 
 def get_release_info():
