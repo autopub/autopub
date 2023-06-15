@@ -2,3 +2,4 @@ docs/_build
 poetry.lock
 __pycache__/
 .vscode/
+dist/
