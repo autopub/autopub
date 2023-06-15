@@ -22,7 +22,7 @@ classifiers = [
 "Issue Tracker" = "https://github.com/autopub/autopub/issues"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.9", optional = true}
 httpx = {version = "=0.16.1", optional = true}
@@ -32,6 +32,7 @@ python-frontmatter = "^1.0.0"
 build = "^0.10.0"
 twine = "^4.0.2"
 dunamai = "^1.17.0"
+pytest-httpserver = "^1.0.8"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"

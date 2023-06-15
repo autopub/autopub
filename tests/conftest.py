@@ -50,6 +50,8 @@ def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
 
 @pytest.fixture
 def example_project() -> Generator[Path, None, None]:
+    # TODO: make a copy of this
+
     project_path = Path(__file__).parent / "fixtures/example-project"
 
     shutil.rmtree(project_path / "dist", ignore_errors=True)
