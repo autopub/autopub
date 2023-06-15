@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 from typing import Any, Generator
@@ -49,18 +48,10 @@ def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def example_project() -> Generator[Path, None, None]:
-    # TODO: make a copy of this
-
+def example_project(temporary_working_directory: Path) -> Generator[Path, None, None]:
     project_path = Path(__file__).parent / "fixtures/example-project"
 
-    shutil.rmtree(project_path / "dist", ignore_errors=True)
+    with temporary_working_directory as dest:
+        shutil.copytree(project_path, dest)
 
-    current_working_directory = os.getcwd()
-
-    os.chdir(project_path)
-
-    try:
-        yield project_path
-    finally:
-        os.chdir(current_working_directory)
+        yield dest
