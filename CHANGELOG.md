@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.3.0 - 2023-06-07
+------------------
+
+* Remove hard dependency on Poetry, by [Florian Apolloner](https://github.com/apollo13) via [PR #38](https://github.com/autopub/autopub/pull/38)
+* Drop Python 3.6 support
+
+0.2.2 - 2022-06-22
+------------------
+
+Fix error when creating GitHub releases [[PR #28](https://github.com/autopub/autopub/pull/28) by [Patrick Arminio](https://github.com/patrick91)]
+
 0.2.1 - 2021-05-20
 ------------------
 

@@ -1,3 +1,5 @@
+import datetime
+
 # Configuration file for the Sphinx documentation builder.
 #
 # Full list of options can be found in the Sphinx documentation:
@@ -7,7 +9,8 @@
 # -- Project Information -----------------------------------------------------
 
 project = "AutoPub"
-copyright = "Justin Mayer"
+year = datetime.datetime.now().date().year
+copyright = f"2019–{year}"
 author = "Justin Mayer"
 
 
