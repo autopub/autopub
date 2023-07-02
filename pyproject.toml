@@ -59,7 +59,7 @@ autopub = "autopub.autopub:main"
 [tool.autopub]
 project-name = "AutoPub"
 git-username = "botpub"
-git-email = "botpub@autopub.rocks"
+git-email = "52496925+botpub@users.noreply.github.com"
 append-github-contributor = true
 
 [build-system]
