@@ -2,7 +2,6 @@ import contextlib
 import json
 import textwrap
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
@@ -115,7 +114,7 @@ def test_can_using_plugins_to_add_additional_validation(
 def test_runs_plugin_when_ok(
     temporary_working_directory: Path, valid_release_text: str
 ):
-    release_info_value: Optional[ReleaseInfo] = None
+    release_info_value: ReleaseInfo | None = None
 
     class MyPlugin(AutopubPlugin):
         def on_release_notes_valid(self, release_info: ReleaseInfo):

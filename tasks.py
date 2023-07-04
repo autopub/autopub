@@ -2,7 +2,6 @@ import os
 
 from invoke import task
 
-
 DOCS_PORT = os.environ.get("DOCS_PORT", 8000)
 
 

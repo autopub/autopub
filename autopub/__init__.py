@@ -1,7 +1,7 @@
 import hashlib
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Type
 
 # TODO: add stubs
 import frontmatter  # type: ignore
@@ -24,7 +24,7 @@ from autopub.types import ReleaseInfo
 class Autopub:
     RELEASE_FILE_PATH = "RELEASE.md"
 
-    def __init__(self, plugins: Iterable[Type[AutopubPlugin]] = ()) -> None:
+    def __init__(self, plugins: Iterable[type[AutopubPlugin]] = ()) -> None:
         self.plugins = [plugin_class() for plugin_class in plugins]
 
     @property

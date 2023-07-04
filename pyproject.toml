@@ -32,7 +32,6 @@ python-frontmatter = "^1.0.0"
 build = "^0.10.0"
 twine = "^4.0.2"
 dunamai = "^1.17.0"
-pytest-httpserver = "^1.0.8"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
@@ -47,14 +46,10 @@ myst-parser = "^0.15"
 Sphinx = "^4.2"
 
 # Linting
-black = {version = "^19.3b0", allow-prereleases = true}
-flake8 = "^3.8"
-flake8-black = "^0.2"
-flake8-bugbear = "^20.0"
-flake8-fixme = "^1.1"
-flake8-markdown = "^0.2.0"
+black = "23.3.0"
 mypy = "^0.971"
 pytest = "^7.1.2"
+pytest-httpserver = "^1.0.8"
 
 [tool.poetry.extras]
 github = ["githubrelease", "httpx"]
@@ -68,17 +63,14 @@ git-username = "botpub"
 git-email = "botpub@autopub.rocks"
 append-github-contributor = true
 
-[tool.isort]
-src_paths = ["autopub", "tests"]
-profile = "black"
-indent = 4
-combine_star = true
-combine_as_imports = true
-lines_after_imports = 2
-known_rich = ["rich"]
-known_pytest = ["pytest"]
-known_first_party = ["autopub"]
-sections = ["FUTURE", "STDLIB", "PYTEST", "THIRDPARTY", "RICH", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.ruff]
+select = [
+  "I",
+  "E",
+  "F",
+  "UP",
+]
 
 
 [build-system]

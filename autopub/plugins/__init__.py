@@ -1,13 +1,11 @@
-from typing import Dict
-
-from typing_extensions import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from autopub.exceptions import AutopubException
 from autopub.types import ReleaseInfo
 
 
 class AutopubPlugin:
-    data: Dict[str, object] = {}
+    data: dict[str, object] = {}
 
     def validate_release_notes(self, release_info: ReleaseInfo):
         ...

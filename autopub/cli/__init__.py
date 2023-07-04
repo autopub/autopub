@@ -1,20 +1,18 @@
-from typing import List, TypedDict
-
-import typer
+from typing import TypedDict
 
 import rich
+import typer
 from rich.panel import Panel
 
 from autopub import Autopub
 from autopub.cli.plugins import find_plugins
 from autopub.exceptions import AutopubException
 
-
 app = typer.Typer()
 
 
 class State(TypedDict):
-    plugins: List[str]
+    plugins: list[str]
 
 
 state: State = {"plugins": []}
@@ -62,7 +60,7 @@ def publish():
 
 @app.callback()
 def main(
-    plugins: List[str] = typer.Option(
+    plugins: list[str] = typer.Option(
         [],
         "--plugin",
         "-p",

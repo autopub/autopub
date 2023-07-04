@@ -1,10 +1,9 @@
 from importlib import import_module
-from typing import List, Optional, Type
 
 from autopub.plugins import AutopubPlugin
 
 
-def _find_plugin(module: object) -> Optional[Type[AutopubPlugin]]:
+def _find_plugin(module: object) -> type[AutopubPlugin] | None:
     for obj in module.__dict__.values():
         if (
             isinstance(obj, type)
@@ -16,8 +15,8 @@ def _find_plugin(module: object) -> Optional[Type[AutopubPlugin]]:
     return None
 
 
-def find_plugins(names: List[str]) -> List[Type[AutopubPlugin]]:
-    plugins: List[Type] = []
+def find_plugins(names: list[str]) -> list[type[AutopubPlugin]]:
+    plugins: list[type] = []
 
     for plugin_name in names:
         try:
