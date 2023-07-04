@@ -50,12 +50,16 @@ def build():
 
 @app.command()
 def publish():
-    """
-    1. commit
-    2. release
-    3. push on pypi or similar
-    """
-    print("publishing")
+    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+
+    try:
+        autopub.publish()
+    except AutopubException as e:
+        rich.print(Panel.fit(f"[red]{e.message}"))
+
+        raise typer.Exit(1) from e
+    else:
+        rich.print(Panel.fit("[green]Publishing succeeded"))
 
 
 @app.callback()

@@ -81,7 +81,9 @@ class Autopub:
         if release_data["hash"] != self.release_file_hash:
             raise ArtifactHashMismatch()
 
-        ...
+        for plugin in self.plugins:
+            if isinstance(plugin, AutopubPackageManagerPlugin):
+                plugin.publish()
 
     def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {

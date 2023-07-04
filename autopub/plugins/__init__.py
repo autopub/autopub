@@ -21,3 +21,6 @@ class AutopubPlugin:
 class AutopubPackageManagerPlugin(Protocol):
     def build(self) -> None:
         ...
+
+    def publish(self, **kwargs: str) -> None:
+        ...
