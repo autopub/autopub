@@ -55,3 +55,15 @@ def example_project(temporary_working_directory: Path) -> Generator[Path, None, 
         shutil.copytree(project_path, dest, dirs_exist_ok=True)
 
         yield dest
+
+
+@pytest.fixture
+def example_project_pdm(
+    temporary_working_directory: Path,
+) -> Generator[Path, None, None]:
+    project_path = Path(__file__).parent / "fixtures/example-project-pdm"
+
+    with temporary_working_directory as dest:
+        shutil.copytree(project_path, dest, dirs_exist_ok=True)
+
+        yield dest
