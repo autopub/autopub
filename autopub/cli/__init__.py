@@ -25,13 +25,18 @@ def check():
     autopub = Autopub(plugins=find_plugins(state["plugins"]))
 
     try:
-        autopub.check()
+        release_info = autopub.check()
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 
         raise typer.Exit(1) from e
     else:
-        rich.print(Panel.fit("[green]Release file is valid"))
+        rich.print(
+            Panel.fit(
+                "[green]Release file is valid\n"
+                f"[yellow]Release type: {release_info.release_type}\n"
+            )
+        )
 
 
 @app.command()

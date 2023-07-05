@@ -22,6 +22,9 @@ def test_works_with_build_plugin():
             nonlocal built
             built = True
 
+        def publish(self, **kwargs: str):
+            ...
+
     autopub = Autopub(plugins=[ABuildPlugin])
     autopub.build()
 
@@ -38,6 +41,9 @@ def test_works_with_build_plugin_and_other_plugin():
         def build(self):
             nonlocal built
             built = True
+
+        def publish(self, **kwargs: str):
+            ...
 
     autopub = Autopub(plugins=[ANonBuildPlugin, ABuildPlugin])
     autopub.build()
