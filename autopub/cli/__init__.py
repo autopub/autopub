@@ -3,8 +3,6 @@ from typing import TypedDict
 import rich
 import typer
 from rich.console import Group
-from rich.markdown import Markdown
-from rich.padding import Padding
 from rich.panel import Panel
 
 from autopub import Autopub
@@ -35,17 +33,9 @@ def check():
         raise typer.Exit(1) from e
     else:
         rich.print(
-            Padding(
-                Group(
-                    (
-                        "[bold on bright_magenta] Release type: [/] "
-                        f"[yellow italic underline]{release_info.release_type}[/]\n"
-                    ),
-                    "[bold on bright_magenta] Release notes: [/]\n",
-                    Markdown(release_info.release_notes),
-                    "\n---\n\n[green bold]Release file is valid![/] 🚀",
-                ),
-                (1, 1),
+            Group(
+                "[green]Release file is valid 🚀[/]\n\n"
+                f"[bold]Release type:[/] {release_info.release_type}",
             )
         )
 
