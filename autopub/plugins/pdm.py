@@ -9,7 +9,7 @@ class PDMPlugin(AutopubPlugin, AutopubPackageManagerPlugin):
     def build(self) -> None:
         self.run_command(["pdm", "build"])
 
-    def publish(self, repository: str | None, **kwargs: Any) -> None:
+    def publish(self, repository: str | None = None, **kwargs: Any) -> None:
         additional_args: list[str] = []
 
         if repository:

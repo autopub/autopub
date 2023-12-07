@@ -95,7 +95,7 @@ class Autopub:
         for plugin in self.plugins:
             plugin.prepare(self.release_data)
 
-    def publish(self, repository: str | None) -> None:
+    def publish(self, repository: str | None = None) -> None:
         # TODO: shall we put this in a function, to make it
         # clear that we are triggering the logic to check the release file?
         self.release_data

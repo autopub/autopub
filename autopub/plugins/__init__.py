@@ -34,5 +34,5 @@ class AutopubPackageManagerPlugin(Protocol):
     def build(self) -> None:
         ...
 
-    def publish(self, repository: str | None, **kwargs: Any) -> None:
+    def publish(self, repository: str | None = None, **kwargs: Any) -> None:
         ...

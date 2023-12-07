@@ -24,9 +24,11 @@ def test_runs_publish(example_project_pdm: Path, httpserver: HTTPServer):
     subprocess.run(
         ["pdm", "config", "repository.example.username", "example"], check=True
     )
+    subprocess.run(
+        ["pdm", "config", "repository.example.password", "example"], check=True
+    )
 
     try:
-
         pdm = PDMPlugin()
         pdm.build()
         pdm.publish(
@@ -41,3 +43,4 @@ def test_runs_publish(example_project_pdm: Path, httpserver: HTTPServer):
         subprocess.run(
             ["pdm", "config", "--delete", "repository.example.username"], check=True
         )
+        subprocess.run(["pdm", "config", "--delete", "repository.example.password"])
