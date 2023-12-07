@@ -37,3 +37,11 @@ class ArtifactNotFound(AutopubException):
 
 class ArtifactHashMismatch(AutopubException):
     message = "Artifact hash mismatch, did you run `autopub check`?"
+
+
+class CommandFailed(AutopubException):
+    def __init__(self, command: list[str], returncode: int) -> None:
+        self.message = (
+            f"Command {' '.join(command)} failed with return code {returncode}"
+        )
+        super().__init__()

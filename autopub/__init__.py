@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import json
 from collections.abc import Iterable
@@ -69,7 +71,7 @@ class Autopub:
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.build()
 
-    def publish(self) -> None:
+    def publish(self, repository: str | None) -> None:
         # TODO: move this to a property and reuse it below
         release_data_file = Path(".autopub") / "release_data.json"
 
@@ -83,7 +85,7 @@ class Autopub:
 
         for plugin in self.plugins:
             if isinstance(plugin, AutopubPackageManagerPlugin):
-                plugin.publish()
+                plugin.publish(repository=repository)
 
     def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {

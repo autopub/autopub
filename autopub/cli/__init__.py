@@ -66,11 +66,16 @@ def build():
 
 
 @app.command()
-def publish():
+def publish(
+    repository: Annotated[
+        Optional[str],
+        typer.Option("--repository", "-r", help="Repository to publish to"),
+    ] = None,
+):
     autopub = Autopub(plugins=find_plugins(state["plugins"]))
 
     try:
-        autopub.publish()
+        autopub.publish(repository=repository)
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 
@@ -79,7 +84,7 @@ def publish():
         rich.print(Panel.fit("[green]Publishing succeeded"))
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
     plugins: list[str] = typer.Option(
         [],
@@ -87,16 +92,12 @@ def main(
         "-p",
         help="List of plugins to use",
     ),
-):
-    state["plugins"] = plugins
-
-
-@app.callback(invoke_without_command=True)
-def version(
     should_show_version: Annotated[
         Optional[bool], typer.Option("--version", is_eager=True)
     ] = None,
 ):
+    state["plugins"] = plugins
+
     if should_show_version:
         from importlib.metadata import version
 

@@ -1,11 +1,20 @@
-from typing import Protocol, runtime_checkable
+from __future__ import annotations
 
-from autopub.exceptions import AutopubException
+import subprocess
+from typing import Any, Protocol, runtime_checkable
+
+from autopub.exceptions import AutopubException, CommandFailed
 from autopub.types import ReleaseInfo
 
 
 class AutopubPlugin:
     data: dict[str, object] = {}
+
+    def run_command(self, command: list[str]) -> None:
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            raise CommandFailed(command=command, returncode=e.returncode) from e
 
     def validate_release_notes(self, release_info: ReleaseInfo):
         ...
@@ -22,5 +31,5 @@ class AutopubPackageManagerPlugin(Protocol):
     def build(self) -> None:
         ...
 
-    def publish(self, **kwargs: str) -> None:
+    def publish(self, repository: str | None, **kwargs: Any) -> None:
         ...
