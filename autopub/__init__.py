@@ -5,8 +5,7 @@ import json
 from collections.abc import Iterable
 from pathlib import Path
 
-# TODO: add stubs
-import frontmatter  # type: ignore
+import frontmatter
 
 from autopub.exceptions import (
     ArtifactHashMismatch,

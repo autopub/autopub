@@ -75,6 +75,8 @@ select = [
   "F",
   "UP",
 ]
+exclude = ["typings"]
+force-exclude = true
 
 
 [build-system]
