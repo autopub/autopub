@@ -93,10 +93,13 @@ def main(
 
 @app.callback(invoke_without_command=True)
 def version(
-    _: Annotated[Optional[bool], typer.Option("--version", is_eager=True)] = None,
+    should_show_version: Annotated[
+        Optional[bool], typer.Option("--version", is_eager=True)
+    ] = None,
 ):
-    from importlib.metadata import version
+    if should_show_version:
+        from importlib.metadata import version
 
-    print(version("autopub"))
+        print(version("autopub"))
 
-    raise typer.Exit()
+        raise typer.Exit()
