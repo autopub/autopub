@@ -3,3 +3,4 @@ poetry.lock
 __pycache__/
 .vscode/
 dist/
+.coverage

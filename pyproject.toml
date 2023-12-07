@@ -61,6 +61,9 @@ github = ["githubrelease", "httpx"]
 [tool.poetry.scripts]
 autopub = "autopub.cli:app"
 
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.1.0"
+
 [tool.autopub]
 project-name = "AutoPub"
 git-username = "botpub"
