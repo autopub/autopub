@@ -44,6 +44,23 @@ class Autopub:
     def release_data_file(self) -> Path:
         return Path(".autopub") / "release_data.json"
 
+    # TODO: typed dict
+    @property
+    def release_data(self) -> ReleaseInfo:
+        if not self.release_data_file.exists():
+            raise ArtifactNotFound()
+
+        release_data = json.loads(self.release_data_file.read_text())
+
+        if release_data["hash"] != self.release_file_hash:
+            raise ArtifactHashMismatch()
+
+        return ReleaseInfo(
+            release_type=release_data["release_type"],
+            release_notes=release_data["release_notes"],
+            additional_info=release_data["plugin_data"],
+        )
+
     def check(self) -> ReleaseInfo:
         release_file = Path(self.RELEASE_FILE_PATH)
 
@@ -74,14 +91,14 @@ class Autopub:
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.build()
 
+    def prepare(self) -> None:
+        for plugin in self.plugins:
+            plugin.prepare(self.release_data)
+
     def publish(self, repository: str | None) -> None:
-        if not self.release_data_file.exists():
-            raise ArtifactNotFound()
-
-        release_data = json.loads(self.release_data_file.read_text())
-
-        if release_data["hash"] != self.release_file_hash:
-            raise ArtifactHashMismatch()
+        # TODO: shall we put this in a function, to make it
+        # clear that we are triggering the logic to check the release file?
+        self.release_data
 
         for plugin in self.plugins:
             if isinstance(plugin, AutopubPackageManagerPlugin):

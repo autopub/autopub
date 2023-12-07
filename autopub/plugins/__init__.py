@@ -16,6 +16,9 @@ class AutopubPlugin:
         except subprocess.CalledProcessError as e:
             raise CommandFailed(command=command, returncode=e.returncode) from e
 
+    def prepare(self, release_info: ReleaseInfo) -> None:
+        ...
+
     def validate_release_notes(self, release_info: ReleaseInfo):
         ...
 

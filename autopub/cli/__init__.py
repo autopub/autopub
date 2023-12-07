@@ -66,6 +66,20 @@ def build():
 
 
 @app.command()
+def prepare():
+    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+
+    try:
+        autopub.prepare()
+    except AutopubException as e:
+        rich.print(Panel.fit(f"[red]{e.message}"))
+
+        raise typer.Exit(1) from e
+    else:
+        rich.print(Panel.fit("[green]Preparation succeeded"))
+
+
+@app.command()
 def publish(
     repository: Annotated[
         Optional[str],
@@ -97,6 +111,7 @@ def main(
     ] = None,
 ):
     state["plugins"] = plugins
+    state["plugins"].extend(["bump_version"])
 
     if should_show_version:
         from importlib.metadata import version
