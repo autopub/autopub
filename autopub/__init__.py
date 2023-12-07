@@ -41,6 +41,10 @@ class Autopub:
     def release_file_hash(self) -> str:
         return hashlib.sha256(self.release_notes.encode("utf-8")).hexdigest()
 
+    @property
+    def release_data_file(self) -> Path:
+        return Path(".autopub") / "release_data.json"
+
     def check(self) -> ReleaseInfo:
         release_file = Path(self.RELEASE_FILE_PATH)
 
@@ -72,13 +76,10 @@ class Autopub:
                 plugin.build()
 
     def publish(self, repository: str | None) -> None:
-        # TODO: move this to a property and reuse it below
-        release_data_file = Path(".autopub") / "release_data.json"
-
-        if not release_data_file.exists():
+        if not self.release_data_file.exists():
             raise ArtifactNotFound()
 
-        release_data = json.loads(release_data_file.read_text())
+        release_data = json.loads(self.release_data_file.read_text())
 
         if release_data["hash"] != self.release_file_hash:
             raise ArtifactHashMismatch()
@@ -99,9 +100,8 @@ class Autopub:
             },
         }
 
-        release_data_file = Path(".autopub") / "release_data.json"
-        release_data_file.parent.mkdir(exist_ok=True)
-        release_data_file.write_text(json.dumps(data))
+        self.release_data_file.parent.mkdir(exist_ok=True)
+        self.release_data_file.write_text(json.dumps(data))
 
     def _deprecated_load(self, release_notes: str) -> ReleaseInfo:
         # supports loading of old release notes format, which is
