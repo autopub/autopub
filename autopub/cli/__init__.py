@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 import rich
 import typer
@@ -6,6 +6,7 @@ from rich.console import Group
 from rich.markdown import Markdown
 from rich.padding import Padding
 from rich.panel import Panel
+from typing_extensions import Annotated
 
 from autopub import Autopub
 from autopub.cli.plugins import find_plugins
@@ -85,6 +86,17 @@ def main(
         "--plugin",
         "-p",
         help="List of plugins to use",
-    )
+    ),
 ):
     state["plugins"] = plugins
+
+
+@app.callback(invoke_without_command=True)
+def version(
+    _: Annotated[Optional[bool], typer.Option("--version", is_eager=True)] = None,
+):
+    from importlib.metadata import version
+
+    print(version("autopub"))
+
+    raise typer.Exit()

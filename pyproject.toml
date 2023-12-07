@@ -1,3 +1,6 @@
+[project]
+requires-python = ">=3.8"
+
 [tool.poetry]
 name = "autopub"
 version = "1.0.0-beta1"
@@ -18,6 +21,7 @@ classifiers = [
     "Topic :: System :: Systems Administration",
 ]
 
+
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/autopub/autopub/issues"
 
@@ -26,7 +30,7 @@ python = "^3.8"
 tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.9", optional = true}
 httpx = {version = "=0.16.1", optional = true}
-typer = "^0.6.1"
+typer = "^0.9.0"
 rich = "^12.5.1"
 python-frontmatter = "^1.0.0"
 build = "^0.10.0"
