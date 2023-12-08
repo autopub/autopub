@@ -32,7 +32,7 @@ class AutopubPlugin:
     def on_release_notes_invalid(self, exception: AutopubException):  # pragma: no cover
         ...
 
-    def post_publish(self) -> None:  # pragma: no cover
+    def post_publish(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
 

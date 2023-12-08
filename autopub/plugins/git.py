@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from typing import Any
-
 from autopub.plugins import AutopubPlugin
+from autopub.types import ReleaseInfo
 
 
 class GitPlugin(AutopubPlugin):
-    def post_publish(self, repository: str | None = None, **kwargs: Any) -> None:
+    def post_publish(self, release_info: ReleaseInfo) -> None:
         self.run_command(["git", "config", "--global", "user.email", "autopub@autopub"])
         self.run_command(["git", "config", "--global", "user.name", "autopub"])
 
-        self.run_command(["git", "add", "."])
+        self.run_command(["git", "tag", release_info.additional_info["new_version"]])
 
+        self.run_command(["git", "add", "--all", "--", ":!main/.autopub"])
         self.run_command(["git", "commit", "-m", "🤖 autopub publish"])
-
-        self.run_command(["git", "push"])
+        self.run_command(["git", "push", "--tags"])

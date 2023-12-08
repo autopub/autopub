@@ -105,16 +105,15 @@ class Autopub:
         self.release_file.unlink()
 
     def publish(self, repository: str | None = None) -> None:
-        # TODO: shall we put this in a function, to make it
-        # clear that we are triggering the logic to check the release file?
-        self.release_data
+        release_info = self.release_data
 
         for plugin in self.plugins:
+            # TODO: maybe pass release info to publish method?
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.publish(repository=repository)
 
         for plugin in self.plugins:
-            plugin.post_publish()
+            plugin.post_publish(release_info)
 
         self._delete_release_file()
 
