@@ -46,5 +46,9 @@ class UpdateChangelogPlugin(AutopubPlugin):
             f.write(f"\n{new_version_header}\n")
             f.write(f"{VERSION_HEADER * len(new_version_header)}\n\n")
             f.write(release_info.release_notes)
+
+            for line in release_info.additional_release_notes:
+                f.write(f"\n\n{line}")
+
             f.write("\n")
             f.write("\n".join(old_changelog_data))

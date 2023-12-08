@@ -10,6 +10,7 @@ class ReleaseInfo:
     release_type: str
     release_notes: str
     additional_info: dict[str, str] = dataclasses.field(default_factory=dict)
+    additional_release_notes: list[str] = dataclasses.field(default_factory=list)
 
     def with_version(
         self, version: str, previous_version: str
