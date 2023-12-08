@@ -21,6 +21,8 @@ classifiers = [
     "Topic :: System :: Systems Administration",
 ]
 
+include = ["autopub/py.typed"]
+
 
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/autopub/autopub/issues"
