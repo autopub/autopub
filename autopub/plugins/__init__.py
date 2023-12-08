@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from typing import Any, Protocol, runtime_checkable
 
@@ -12,7 +13,7 @@ class AutopubPlugin:
 
     def run_command(self, command: list[str]) -> None:
         try:
-            subprocess.run(command, check=True)
+            subprocess.run(command, check=True, env=os.environ.copy())
         except subprocess.CalledProcessError as e:
             raise CommandFailed(command=command, returncode=e.returncode) from e
 

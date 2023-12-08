@@ -111,7 +111,13 @@ def main(
     ] = None,
 ):
     state["plugins"] = plugins
-    state["plugins"].extend(["update_changelog", "bump_version"])
+    state["plugins"].extend(
+        [
+            "git",
+            "update_changelog",
+            "bump_version",
+        ]
+    )
 
     if should_show_version:
         from importlib.metadata import version
