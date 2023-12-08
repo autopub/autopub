@@ -11,6 +11,8 @@ class GitPlugin(AutopubPlugin):
 
         self.run_command(["git", "tag", release_info.additional_info["new_version"]])
 
+        # TODO: config?
+        self.run_command(["git", "remove", "RELEASE.md"])
         self.run_command(["git", "add", "--all", "--", ":!main/.autopub"])
         self.run_command(["git", "commit", "-m", "🤖 autopub publish"])
         self.run_command(["git", "push", "--tags"])
