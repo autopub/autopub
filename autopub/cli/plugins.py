@@ -1,3 +1,5 @@
+import contextlib
+import sys
 from importlib import import_module
 
 from autopub.plugins import AutopubPlugin
@@ -15,23 +17,29 @@ def _find_plugin(module: object) -> type[AutopubPlugin] | None:
     return None
 
 
+def _get_plugin(name_or_path: str) -> type[AutopubPlugin] | None:
+    with contextlib.suppress(ImportError):
+        plugin_module = import_module(name_or_path)
+
+        return _find_plugin(plugin_module)
+
+    return None
+
+
 def find_plugins(names: list[str]) -> list[type[AutopubPlugin]]:
+    sys.path.append(".")
+
     plugins: list[type] = []
 
     for plugin_name in names:
-        try:
-            # TODO: find plugins outside the autopub namespace
-            plugin_module = import_module(f"autopub.plugins.{plugin_name}")
+        plugin_class = _get_plugin(f"{plugin_name}")
 
-            plugin_class = _find_plugin(plugin_module)
+        if plugin_class is None:
+            plugin_class = _get_plugin(f"autopub.plugins.{plugin_name}")
 
-            if plugin_class is None:
-                print(f"Could not find plugin {plugin_name}")
-                # TODO: raise
-                continue
+        if plugin_class is None:
+            raise ValueError(f"Could not find plugin {plugin_name}")
 
-            plugins.append(plugin_class)
-        except ImportError as e:
-            print(f"Error importing plugin {plugin_name}: {e}")
+        plugins.append(plugin_class)
 
     return plugins
