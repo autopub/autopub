@@ -6,13 +6,16 @@ from autopub.types import ReleaseInfo
 
 class GitPlugin(AutopubPlugin):
     def post_publish(self, release_info: ReleaseInfo) -> None:
+        tag = release_info.additional_info["new_version"]
+
         self.run_command(["git", "config", "--global", "user.email", "autopub@autopub"])
         self.run_command(["git", "config", "--global", "user.name", "autopub"])
 
-        self.run_command(["git", "tag", release_info.additional_info["new_version"]])
+        self.run_command(["git", "tag", tag])
 
         # TODO: config?
         self.run_command(["git", "rm", "RELEASE.md"])
         self.run_command(["git", "add", "--all", "--", ":!main/.autopub"])
         self.run_command(["git", "commit", "-m", "🤖 autopub publish"])
-        self.run_command(["git", "push", "--tags"])
+        self.run_command(["git", "push"])
+        self.run_command(["git", "push", tag])
