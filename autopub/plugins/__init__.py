@@ -17,6 +17,9 @@ class AutopubPlugin:
         except subprocess.CalledProcessError as e:
             raise CommandFailed(command=command, returncode=e.returncode) from e
 
+    def post_check(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
+        ...
+
     def prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
@@ -33,6 +36,15 @@ class AutopubPlugin:
         ...
 
     def post_publish(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
+        ...
+
+
+@runtime_checkable
+class AutopubBumpVersionPlugin(Protocol):
+    new_version: str
+    current_version: str
+
+    def post_check(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
 

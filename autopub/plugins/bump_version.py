@@ -5,11 +5,14 @@ import pathlib
 import tomlkit
 from dunamai import Version
 
-from autopub.plugins import AutopubPlugin
+from autopub.plugins import AutopubBumpVersionPlugin, AutopubPlugin
 from autopub.types import ReleaseInfo
 
 
-class BumpVersionPlugin(AutopubPlugin):
+class BumpVersionPlugin(AutopubBumpVersionPlugin, AutopubPlugin):
+    current_version: str
+    new_version: str
+
     @property
     def pyproject_config(self) -> tomlkit.TOMLDocument:
         content = pathlib.Path("pyproject.toml").read_text()
@@ -28,17 +31,16 @@ class BumpVersionPlugin(AutopubPlugin):
         except KeyError:
             config["project"]["version"] = new_version  # type: ignore
 
-    def prepare(self, release_info: ReleaseInfo) -> None:
+    def post_check(self, release_info: ReleaseInfo) -> None:
         config = self.pyproject_config
+
+        bump_type = {"major": 0, "minor": 1, "patch": 2}[release_info.release_type]
 
         version = Version(self._get_version(config))
 
-        bump_type = {"major": 0, "minor": 1, "patch": 2}[release_info.release_type]
-        new_version = version.bump(bump_type).serialize()
+        self.previous_version = str(version)
+        self.new_version = version.bump(bump_type).serialize()
 
-        self.data["old_version"] = version.serialize()
-        self.data["new_version"] = new_version
-
-        self._update_version(config, new_version)
+        self._update_version(config, self.new_version)
 
         pathlib.Path("pyproject.toml").write_text(tomlkit.dumps(config))  # type: ignore

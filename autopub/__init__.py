@@ -41,23 +41,23 @@ class Autopub:
         return hashlib.sha256(self.release_notes.encode("utf-8")).hexdigest()
 
     @property
-    def release_data_file(self) -> Path:
-        return Path(".autopub") / "release_data.json"
+    def release_info_file(self) -> Path:
+        return Path(".autopub") / "release_info.json"
 
     @property
-    def release_data(self) -> ReleaseInfo:
-        if not self.release_data_file.exists():
+    def release_info(self) -> ReleaseInfo:
+        if not self.release_info_file.exists():
             raise ArtifactNotFound()
 
-        release_data = json.loads(self.release_data_file.read_text())
+        release_info = json.loads(self.release_info_file.read_text())
 
-        if release_data["hash"] != self.release_file_hash:
+        if release_info["hash"] != self.release_file_hash:
             raise ArtifactHashMismatch()
 
         return ReleaseInfo(
-            release_type=release_data["release_type"],
-            release_notes=release_data["release_notes"],
-            additional_info=release_data["plugin_data"],
+            release_type=release_info["release_type"],
+            release_notes=release_info["release_notes"],
+            additional_info=release_info["plugin_data"],
         )
 
     def check(self) -> ReleaseInfo:
@@ -76,6 +76,9 @@ class Autopub:
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 
+        for plugin in self.plugins:
+            plugin.post_check(release_info)
+
         self._write_artifact(release_info)
 
         return release_info
@@ -92,20 +95,20 @@ class Autopub:
 
     def prepare(self) -> None:
         for plugin in self.plugins:
-            plugin.prepare(self.release_data)
+            plugin.prepare(self.release_info)
 
-        self._write_artifact(self.release_data)
+        self._write_artifact(self.release_info)
 
         for plugin in self.plugins:
-            plugin.post_prepare(self.release_data)
+            plugin.post_prepare(self.release_info)
 
-        self._write_artifact(self.release_data)
+        self._write_artifact(self.release_info)
 
     def _delete_release_file(self) -> None:
         self.release_file.unlink(missing_ok=True)
 
     def publish(self, repository: str | None = None) -> None:
-        release_info = self.release_data
+        release_info = self.release_info
 
         for plugin in self.plugins:
             # TODO: maybe pass release info to publish method?
@@ -129,8 +132,8 @@ class Autopub:
             },
         }
 
-        self.release_data_file.parent.mkdir(exist_ok=True)
-        self.release_data_file.write_text(json.dumps(data))
+        self.release_info_file.parent.mkdir(exist_ok=True)
+        self.release_info_file.write_text(json.dumps(data))
 
     def _deprecated_load(self, release_notes: str) -> ReleaseInfo:
         # supports loading of old release notes format, which is

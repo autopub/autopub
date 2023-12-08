@@ -176,13 +176,13 @@ def test_check_creates_an_artifact(
     autopub = Autopub()
     autopub.check()
 
-    artifact = working_dir / ".autopub" / "release_data.json"
+    artifact = working_dir / ".autopub" / "release_info.json"
 
     assert artifact.exists()
 
-    release_data = json.loads(artifact.read_text())
+    release_info = json.loads(artifact.read_text())
 
-    assert release_data == {
+    assert release_info == {
         "hash": "2081c77abe0980abd6474bdec5d21afceedb7726d6e0c9af3a14d9f24587a268",
         "release_type": "patch",
         "release_notes": "This is a new release.",
@@ -211,13 +211,13 @@ def test_check_with_plugins_adds_data_to_artifact(temporary_working_directory: P
     autopub = Autopub(plugins=[TweetPlugin])
     autopub.check()
 
-    artifact = temporary_working_directory / ".autopub" / "release_data.json"
+    artifact = temporary_working_directory / ".autopub" / "release_info.json"
 
     assert artifact.exists()
 
-    release_data = json.loads(artifact.read_text())
+    release_info = json.loads(artifact.read_text())
 
-    assert release_data == {
+    assert release_info == {
         "hash": "e866f4cbbf0dbbebee9180395a85dbaeb92eda5890662408fa6a4d47551910e4",
         "release_type": "patch",
         "release_notes": "Valid release notes",

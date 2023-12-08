@@ -26,7 +26,7 @@ def test_publish_fails_if_hash_is_different(
         "release_notes": "This is a new release.",
     }
 
-    artifact = temporary_working_directory / ".autopub/release_data.json"
+    artifact = temporary_working_directory / ".autopub/release_info.json"
     artifact.parent.mkdir(exist_ok=True)
     artifact.write_text(json.dumps(release_data))
 
