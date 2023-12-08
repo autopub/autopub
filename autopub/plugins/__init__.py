@@ -16,23 +16,25 @@ class AutopubPlugin:
         except subprocess.CalledProcessError as e:
             raise CommandFailed(command=command, returncode=e.returncode) from e
 
-    def prepare(self, release_info: ReleaseInfo) -> None:
+    def prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
-    def validate_release_notes(self, release_info: ReleaseInfo):
+    def validate_release_notes(self, release_info: ReleaseInfo):  # pragma: no cover
         ...
 
-    def on_release_notes_valid(self, release_info: ReleaseInfo):
+    def on_release_notes_valid(self, release_info: ReleaseInfo):  # pragma: no cover
         ...
 
-    def on_release_notes_invalid(self, exception: AutopubException):
+    def on_release_notes_invalid(self, exception: AutopubException):  # pragma: no cover
         ...
 
 
 @runtime_checkable
 class AutopubPackageManagerPlugin(Protocol):
-    def build(self) -> None:
+    def build(self) -> None:  # pragma: no cover
         ...
 
-    def publish(self, repository: str | None = None, **kwargs: Any) -> None:
+    def publish(
+        self, repository: str | None = None, **kwargs: Any
+    ) -> None:  # pragma: no cover
         ...

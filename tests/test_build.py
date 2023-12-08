@@ -22,7 +22,7 @@ def test_works_with_build_plugin():
             nonlocal built
             built = True
 
-        def publish(self, **kwargs: str):
+        def publish(self, **kwargs: str):  # pragma: no cover
             ...
 
     autopub = Autopub(plugins=[ABuildPlugin])
@@ -42,7 +42,7 @@ def test_works_with_build_plugin_and_other_plugin():
             nonlocal built
             built = True
 
-        def publish(self, **kwargs: str):
+        def publish(self, **kwargs: str):  # pragma: no cover
             ...
 
     autopub = Autopub(plugins=[ANonBuildPlugin, ABuildPlugin])
