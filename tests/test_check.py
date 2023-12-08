@@ -20,8 +20,8 @@ from autopub.types import ReleaseInfo
 
 class VersionPlugin(AutopubPlugin, AutopubBumpVersionPlugin):
     def post_check(self, release_info: ReleaseInfo):
-        self.current_version = "1.0.0"
-        self.new_version = "1.0.1"
+        release_info.version = "1.0.1"
+        release_info.previous_version = "1.0.0"
 
 
 def test_check_fails_if_no_release_file_is_present(temporary_working_directory: Path):
@@ -36,7 +36,8 @@ def test_works(temporary_working_directory: Path, valid_release_text: str):
     release_file.write_text(valid_release_text)
 
     autopub = Autopub(plugins=[VersionPlugin])
-    release_info = autopub.check()
+    autopub.check()
+    release_info = autopub.release_info
 
     assert release_info.release_type == "patch"
     assert release_info.release_notes == "This is a new release."
@@ -170,7 +171,8 @@ def test_supports_old_format(
     release_file.write_text(deprecated_release_text)
 
     autopub = Autopub(plugins=[VersionPlugin])
-    release_info = autopub.check()
+    autopub.check()
+    release_info = autopub.release_info
 
     assert release_info.release_type == "patch"
     assert release_info.release_notes == "This is a new release."
@@ -192,12 +194,14 @@ def test_check_creates_an_artifact(
 
     release_info = json.loads(artifact.read_text())
 
-    # TODO: shall we store versions? (yes)
     assert release_info == {
         "hash": "2081c77abe0980abd6474bdec5d21afceedb7726d6e0c9af3a14d9f24587a268",
         "release_type": "patch",
         "release_notes": "This is a new release.",
-        "plugin_data": {},
+        "additional_info": {"content": "This is a new release."},
+        "additional_release_notes": [],
+        "version": "1.0.1",
+        "previous_version": "1.0.0",
     }
 
 
@@ -232,7 +236,13 @@ def test_check_with_plugins_adds_data_to_artifact(temporary_working_directory: P
         "hash": "e866f4cbbf0dbbebee9180395a85dbaeb92eda5890662408fa6a4d47551910e4",
         "release_type": "patch",
         "release_notes": "Valid release notes",
-        "plugin_data": {"tweet": "This is a new release 🙌"},
+        "additional_info": {
+            "tweet": "This is a new release 🙌",
+            "content": "Valid release notes",
+        },
+        "additional_release_notes": [],
+        "version": "1.0.1",
+        "previous_version": "1.0.0",
     }
 
 
@@ -254,3 +264,21 @@ def test_post_check_runs_after_check(
     autopub.check()
 
     assert post_check_called
+
+
+def test_plugin_can_update_info(
+    temporary_working_directory: Path, valid_release_text: str
+):
+    class MyPlugin(AutopubPlugin):
+        def post_check(self, release_info: ReleaseInfo):
+            release_info.additional_info["tweet"] = "This is a new release 🙌"
+
+    autopub = Autopub(plugins=[MyPlugin, VersionPlugin])
+
+    release_file = temporary_working_directory / "RELEASE.md"
+    release_file.write_text(valid_release_text)
+
+    autopub.check()
+    release_info = autopub.release_info
+
+    assert release_info.additional_info["tweet"] == "This is a new release 🙌"

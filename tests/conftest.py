@@ -82,6 +82,10 @@ def with_valid_artifact(temporary_working_directory: Path) -> Path:
         "release_notes": "foo",
         "release_type": "patch",
         "plugin_data": {},
+        "additional_info": {},
+        "additional_release_notes": [],
+        "version": "1.0.0",
+        "previous_version": "0.0.1",
     }
     release_info.write_text(json.dumps(data))
 

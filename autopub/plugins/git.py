@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from autopub.plugins import AutopubPlugin
-from autopub.types import ReleaseInfoWithVersion
+from autopub.types import ReleaseInfo
 
 
 class GitPlugin(AutopubPlugin):
-    def post_publish(self, release_info: ReleaseInfoWithVersion) -> None:
+    def post_publish(self, release_info: ReleaseInfo) -> None:
+        assert release_info.version is not None
+
         tag_name = release_info.version
 
         self.run_command(["git", "config", "--global", "user.email", "autopub@autopub"])

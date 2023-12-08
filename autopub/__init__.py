@@ -19,11 +19,10 @@ from autopub.exceptions import (
     ReleaseTypeMissing,
 )
 from autopub.plugins import (
-    AutopubBumpVersionPlugin,
     AutopubPackageManagerPlugin,
     AutopubPlugin,
 )
-from autopub.types import ReleaseInfo, ReleaseInfoWithVersion
+from autopub.types import ReleaseInfo
 
 
 class Autopub:
@@ -58,13 +57,9 @@ class Autopub:
         if release_info["hash"] != self.release_file_hash:
             raise ArtifactHashMismatch()
 
-        return ReleaseInfo(
-            release_type=release_info["release_type"],
-            release_notes=release_info["release_notes"],
-            additional_info=release_info["plugin_data"],
-        )
+        return ReleaseInfo.from_dict(release_info)
 
-    def check(self) -> ReleaseInfoWithVersion:
+    def check(self) -> None:
         release_file = Path(self.RELEASE_FILE_PATH)
 
         if not release_file.exists():
@@ -80,24 +75,10 @@ class Autopub:
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 
-        version = None
-        previous_version = None
-
         for plugin in self.plugins:
             plugin.post_check(release_info)
 
-            if isinstance(plugin, AutopubBumpVersionPlugin):
-                version = plugin.new_version
-                previous_version = plugin.current_version
-
-        # TODO: raise exception if version is None
-
-        assert version is not None
-        assert previous_version is not None
-
         self._write_artifact(release_info)
-
-        return release_info.with_version(version, previous_version)
 
     def build(self) -> None:
         if not any(
@@ -110,15 +91,15 @@ class Autopub:
                 plugin.build()
 
     def prepare(self) -> None:
-        for plugin in self.plugins:
-            plugin.prepare(self.release_info)
-
-        self._write_artifact(self.release_info)
+        release_info = self.release_info
 
         for plugin in self.plugins:
-            plugin.post_prepare(self.release_info)
+            plugin.prepare(release_info)
 
-        self._write_artifact(self.release_info)
+        for plugin in self.plugins:
+            plugin.post_prepare(release_info)
+
+        self._write_artifact(release_info)
 
     def _delete_release_file(self) -> None:
         self.release_file.unlink(missing_ok=True)
@@ -138,14 +119,8 @@ class Autopub:
 
     def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {
+            **release_info.dict(),
             "hash": self.release_file_hash,
-            "release_type": release_info.release_type,
-            "release_notes": release_info.release_notes,
-            "plugin_data": {
-                key: value
-                for plugin in self.plugins
-                for key, value in plugin.data.items()
-            },
         }
 
         self.release_info_file.parent.mkdir(exist_ok=True)
@@ -197,6 +172,8 @@ class Autopub:
             release_type=release_type,
             release_notes=post.content,
             additional_info=data,
+            version=None,
+            previous_version=None,
         )
 
     def _validate_release_notes(self, release_notes: str) -> ReleaseInfo:

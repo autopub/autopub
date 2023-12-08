@@ -4,7 +4,7 @@ from datetime import date
 from pathlib import Path
 
 from autopub.plugins import AutopubPlugin
-from autopub.types import ReleaseInfoWithVersion
+from autopub.types import ReleaseInfo
 
 # TODO: from config
 CHANGELOG_HEADER = "========="
@@ -16,7 +16,7 @@ class UpdateChangelogPlugin(AutopubPlugin):
     def changelog_file(self) -> Path:
         return Path("CHANGELOG.md")
 
-    def post_prepare(self, release_info: ReleaseInfoWithVersion) -> None:
+    def post_prepare(self, release_info: ReleaseInfo) -> None:
         if not self.changelog_file.exists():
             self.changelog_file.write_text(f"CHANGELOG\n{CHANGELOG_HEADER}\n\n")
 
@@ -36,6 +36,8 @@ class UpdateChangelogPlugin(AutopubPlugin):
             break
 
         new_version = release_info.version
+
+        assert new_version is not None
 
         with self.changelog_file.open("w") as f:
             f.write("\n".join(header))

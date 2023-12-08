@@ -29,12 +29,14 @@ def check():
     autopub = Autopub(plugins=find_plugins(state["plugins"]))
 
     try:
-        release_info = autopub.check()
+        autopub.check()
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 
         raise typer.Exit(1) from e
     else:
+        release_info = autopub.release_info
+
         rich.print(
             Padding(
                 Group(
