@@ -17,7 +17,7 @@ class UpdateChangelogPlugin(AutopubPlugin):
         return Path("CHANGELOG.md")
 
     def post_prepare(self, release_info: ReleaseInfo) -> None:
-        assert release_info.version is not None
+        assert release_info.additional_info["new_version"]
 
         if not self.changelog_file.exists():
             self.changelog_file.write_text(f"CHANGELOG\n{CHANGELOG_HEADER}\n\n")
@@ -37,11 +37,13 @@ class UpdateChangelogPlugin(AutopubPlugin):
             header = lines[: index + 1]
             break
 
+        new_version = release_info.additional_info["new_version"]
+
         with self.changelog_file.open("w") as f:
             f.write("\n".join(header))
             f.write("\n")
 
-            new_version_header = f"{release_info.version} - {current_date}"
+            new_version_header = f"{new_version} - {current_date}"
 
             f.write(f"\n{new_version_header}\n")
             f.write(f"{VERSION_HEADER * len(new_version_header)}\n\n")

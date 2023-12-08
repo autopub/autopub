@@ -36,6 +36,9 @@ class BumpVersionPlugin(AutopubPlugin):
         bump_type = {"major": 0, "minor": 1, "patch": 2}[release_info.release_type]
         new_version = version.bump(bump_type).serialize()
 
+        self.data["old_version"] = version.serialize()
+        self.data["new_version"] = new_version
+
         self._update_version(config, new_version)
 
         pathlib.Path("pyproject.toml").write_text(tomlkit.dumps(config))  # type: ignore

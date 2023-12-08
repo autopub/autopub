@@ -44,7 +44,6 @@ class Autopub:
     def release_data_file(self) -> Path:
         return Path(".autopub") / "release_data.json"
 
-    # TODO: typed dict
     @property
     def release_data(self) -> ReleaseInfo:
         if not self.release_data_file.exists():
@@ -94,6 +93,19 @@ class Autopub:
     def prepare(self) -> None:
         for plugin in self.plugins:
             plugin.prepare(self.release_data)
+
+        self._write_artifact(self.release_data)
+
+    def post_prepare(self) -> None:
+        for plugin in self.plugins:
+            plugin.post_prepare(self.release_data)
+
+        self._write_artifact(self.release_data)
+
+        self._delete_release_file()
+
+    def _delete_release_file(self) -> None:
+        self.release_file.unlink()
 
     def publish(self, repository: str | None = None) -> None:
         # TODO: shall we put this in a function, to make it

@@ -71,6 +71,7 @@ def prepare():
 
     try:
         autopub.prepare()
+        autopub.post_prepare()
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 
@@ -111,7 +112,7 @@ def main(
     ] = None,
 ):
     state["plugins"] = plugins
-    state["plugins"].extend(["bump_version"])
+    state["plugins"].extend(["update_changelog", "bump_version"])
 
     if should_show_version:
         from importlib.metadata import version

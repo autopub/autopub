@@ -13,7 +13,11 @@ def test_creates_file(example_project_pdm: Path):
     assert not changelog.exists()
 
     info = ReleaseInfo(
-        release_type="minor", release_notes="This is some example :)", version="0.1.0"
+        release_type="minor",
+        release_notes="This is some example :)",
+        # TODO: I don't like the fact that we have both here
+        version="0.1.0",
+        additional_info={"new_version": "0.1.0"},
     )
 
     plugin = UpdateChangelogPlugin()
@@ -56,7 +60,10 @@ def test_updates_file(example_project_pdm: Path):
     changelog.write_text(initial_changelog)
 
     info = ReleaseInfo(
-        release_type="minor", release_notes="This is some example :)", version="0.1.0"
+        release_type="minor",
+        release_notes="This is some example :)",
+        version="0.1.0",
+        additional_info={"new_version": "0.1.0"},
     )
 
     plugin = UpdateChangelogPlugin()

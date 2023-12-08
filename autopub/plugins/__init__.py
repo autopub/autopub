@@ -19,6 +19,9 @@ class AutopubPlugin:
     def prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
+    def post_prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
+        ...
+
     def validate_release_notes(self, release_info: ReleaseInfo):  # pragma: no cover
         ...
 

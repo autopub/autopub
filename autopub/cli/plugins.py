@@ -1,4 +1,5 @@
 import contextlib
+import os
 import sys
 from importlib import import_module
 
@@ -27,7 +28,7 @@ def _get_plugin(name_or_path: str) -> type[AutopubPlugin] | None:
 
 
 def find_plugins(names: list[str]) -> list[type[AutopubPlugin]]:
-    sys.path.append(".")
+    sys.path.append(os.getcwd())
 
     plugins: list[type] = []
 
