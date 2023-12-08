@@ -31,6 +31,9 @@ class AutopubPlugin:
     def on_release_notes_invalid(self, exception: AutopubException):  # pragma: no cover
         ...
 
+    def post_publish(self) -> None:  # pragma: no cover
+        ...
+
 
 @runtime_checkable
 class AutopubPackageManagerPlugin(Protocol):

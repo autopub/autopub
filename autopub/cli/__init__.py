@@ -71,7 +71,6 @@ def prepare():
 
     try:
         autopub.prepare()
-        autopub.post_prepare()
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
 

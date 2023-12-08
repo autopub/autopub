@@ -96,13 +96,10 @@ class Autopub:
 
         self._write_artifact(self.release_data)
 
-    def post_prepare(self) -> None:
         for plugin in self.plugins:
             plugin.post_prepare(self.release_data)
 
         self._write_artifact(self.release_data)
-
-        self._delete_release_file()
 
     def _delete_release_file(self) -> None:
         self.release_file.unlink()
@@ -115,6 +112,11 @@ class Autopub:
         for plugin in self.plugins:
             if isinstance(plugin, AutopubPackageManagerPlugin):
                 plugin.publish(repository=repository)
+
+        for plugin in self.plugins:
+            plugin.post_publish()
+
+        self._delete_release_file()
 
     def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {
