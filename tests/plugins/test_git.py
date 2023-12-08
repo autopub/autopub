@@ -1,7 +1,7 @@
 from pytest_mock import MockerFixture
 
 from autopub.plugins.git import GitPlugin
-from autopub.types import ReleaseInfo
+from autopub.types import ReleaseInfoWithVersion
 
 
 def test_post_publish(mocker: MockerFixture) -> None:
@@ -9,11 +9,12 @@ def test_post_publish(mocker: MockerFixture) -> None:
 
     mock_run_command = mocker.patch.object(git_plugin, "run_command")
 
-    release_info = ReleaseInfo(
+    release_info = ReleaseInfoWithVersion(
         release_notes="",
         release_type="major",
         additional_info={"new_version": "v1.0.0"},
         version="v1.0.0",
+        previous_version="v0.0.0",
     )
 
     git_plugin.post_publish(release_info)

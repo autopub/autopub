@@ -5,7 +5,7 @@ import subprocess
 from typing import Any, Protocol, runtime_checkable
 
 from autopub.exceptions import AutopubException, CommandFailed
-from autopub.types import ReleaseInfo
+from autopub.types import ReleaseInfo, ReleaseInfoWithVersion
 
 
 class AutopubPlugin:
@@ -23,7 +23,9 @@ class AutopubPlugin:
     def prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
         ...
 
-    def post_prepare(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
+    def post_prepare(
+        self, release_info: ReleaseInfoWithVersion
+    ) -> None:  # pragma: no cover
         ...
 
     def validate_release_notes(self, release_info: ReleaseInfo):  # pragma: no cover
@@ -35,7 +37,9 @@ class AutopubPlugin:
     def on_release_notes_invalid(self, exception: AutopubException):  # pragma: no cover
         ...
 
-    def post_publish(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
+    def post_publish(
+        self, release_info: ReleaseInfoWithVersion
+    ) -> None:  # pragma: no cover
         ...
 
 

@@ -14,7 +14,14 @@ from autopub.exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
+from autopub.plugins import AutopubBumpVersionPlugin
 from autopub.types import ReleaseInfo
+
+
+class VersionPlugin(AutopubPlugin, AutopubBumpVersionPlugin):
+    def post_check(self, release_info: ReleaseInfo):
+        self.current_version = "1.0.0"
+        self.new_version = "1.0.1"
 
 
 def test_check_fails_if_no_release_file_is_present(temporary_working_directory: Path):
@@ -28,11 +35,14 @@ def test_works(temporary_working_directory: Path, valid_release_text: str):
     release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
-    autopub = Autopub()
+    autopub = Autopub(plugins=[VersionPlugin])
     release_info = autopub.check()
 
     assert release_info.release_type == "patch"
     assert release_info.release_notes == "This is a new release."
+    assert release_info.additional_info == {"content": "This is a new release."}
+    assert release_info.version == "1.0.1"
+    assert release_info.previous_version == "1.0.0"
 
 
 def test_fails_if_release_text_is_empty(temporary_working_directory: Path):
@@ -122,7 +132,7 @@ def test_runs_plugin_when_ok(
 
             release_info_value = release_info
 
-    autopub = Autopub(plugins=[MyPlugin])
+    autopub = Autopub(plugins=[MyPlugin, VersionPlugin])
 
     release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(valid_release_text)
@@ -142,7 +152,7 @@ def test_runs_plugin_when_something_is_wrong(temporary_working_directory: Path):
 
             error_value = exception.message
 
-    autopub = Autopub(plugins=[MyPlugin])
+    autopub = Autopub(plugins=[MyPlugin, VersionPlugin])
 
     release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text("Get a 🚀")
@@ -159,7 +169,7 @@ def test_supports_old_format(
     release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text(deprecated_release_text)
 
-    autopub = Autopub()
+    autopub = Autopub(plugins=[VersionPlugin])
     release_info = autopub.check()
 
     assert release_info.release_type == "patch"
@@ -173,7 +183,7 @@ def test_check_creates_an_artifact(
     release_file = working_dir / "RELEASE.md"
     release_file.write_text(valid_release_text)
 
-    autopub = Autopub()
+    autopub = Autopub(plugins=[VersionPlugin])
     autopub.check()
 
     artifact = working_dir / ".autopub" / "release_info.json"
@@ -182,6 +192,7 @@ def test_check_creates_an_artifact(
 
     release_info = json.loads(artifact.read_text())
 
+    # TODO: shall we store versions? (yes)
     assert release_info == {
         "hash": "2081c77abe0980abd6474bdec5d21afceedb7726d6e0c9af3a14d9f24587a268",
         "release_type": "patch",
@@ -208,7 +219,7 @@ def test_check_with_plugins_adds_data_to_artifact(temporary_working_directory: P
         def validate_release_notes(self, release_info: ReleaseInfo):
             self.data["tweet"] = release_info.additional_info["tweet"]
 
-    autopub = Autopub(plugins=[TweetPlugin])
+    autopub = Autopub(plugins=[TweetPlugin, VersionPlugin])
     autopub.check()
 
     artifact = temporary_working_directory / ".autopub" / "release_info.json"
@@ -223,3 +234,23 @@ def test_check_with_plugins_adds_data_to_artifact(temporary_working_directory: P
         "release_notes": "Valid release notes",
         "plugin_data": {"tweet": "This is a new release 🙌"},
     }
+
+
+def test_post_check_runs_after_check(
+    temporary_working_directory: Path, valid_release_text: str
+):
+    post_check_called = False
+
+    class MyPlugin(AutopubPlugin):
+        def post_check(self, release_info: ReleaseInfo):
+            nonlocal post_check_called
+            post_check_called = True
+
+    autopub = Autopub(plugins=[MyPlugin, VersionPlugin])
+
+    release_file = temporary_working_directory / "RELEASE.md"
+    release_file.write_text(valid_release_text)
+
+    autopub.check()
+
+    assert post_check_called

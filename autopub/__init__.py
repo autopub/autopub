@@ -18,8 +18,12 @@ from autopub.exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
-from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
-from autopub.types import ReleaseInfo
+from autopub.plugins import (
+    AutopubBumpVersionPlugin,
+    AutopubPackageManagerPlugin,
+    AutopubPlugin,
+)
+from autopub.types import ReleaseInfo, ReleaseInfoWithVersion
 
 
 class Autopub:
@@ -60,7 +64,7 @@ class Autopub:
             additional_info=release_info["plugin_data"],
         )
 
-    def check(self) -> ReleaseInfo:
+    def check(self) -> ReleaseInfoWithVersion:
         release_file = Path(self.RELEASE_FILE_PATH)
 
         if not release_file.exists():
@@ -76,12 +80,24 @@ class Autopub:
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 
+        version = None
+        previous_version = None
+
         for plugin in self.plugins:
             plugin.post_check(release_info)
 
+            if isinstance(plugin, AutopubBumpVersionPlugin):
+                version = plugin.new_version
+                previous_version = plugin.current_version
+
+        # TODO: raise exception if version is None
+
+        assert version is not None
+        assert previous_version is not None
+
         self._write_artifact(release_info)
 
-        return release_info
+        return release_info.with_version(version, previous_version)
 
     def build(self) -> None:
         if not any(

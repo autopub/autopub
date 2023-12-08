@@ -4,7 +4,7 @@ from pathlib import Path
 import time_machine
 
 from autopub.plugins.update_changelog import UpdateChangelogPlugin
-from autopub.types import ReleaseInfo
+from autopub.types import ReleaseInfoWithVersion
 
 
 @time_machine.travel("2021-08-02")
@@ -12,12 +12,11 @@ def test_creates_file(example_project_pdm: Path):
     changelog = example_project_pdm / "CHANGELOG.md"
     assert not changelog.exists()
 
-    info = ReleaseInfo(
+    info = ReleaseInfoWithVersion(
         release_type="minor",
         release_notes="This is some example :)",
-        # TODO: I don't like the fact that we have both here
         version="0.1.0",
-        additional_info={"new_version": "0.1.0"},
+        previous_version="0.0.9",
     )
 
     plugin = UpdateChangelogPlugin()
@@ -59,11 +58,11 @@ def test_updates_file(example_project_pdm: Path):
 
     changelog.write_text(initial_changelog)
 
-    info = ReleaseInfo(
+    info = ReleaseInfoWithVersion(
         release_type="minor",
         release_notes="This is some example :)",
         version="0.1.0",
-        additional_info={"new_version": "0.1.0"},
+        previous_version="0.0.9",
     )
 
     plugin = UpdateChangelogPlugin()

@@ -5,6 +5,7 @@ import pytest
 
 from autopub import Autopub
 from autopub.exceptions import ArtifactHashMismatch, ArtifactNotFound
+from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
 
 
 def test_publish_fails_without_artifact():
@@ -34,3 +35,17 @@ def test_publish_fails_if_hash_is_different(
 
     with pytest.raises(ArtifactHashMismatch):
         autopub.publish()
+
+
+def test_works(with_valid_artifact: Path):
+    published = False
+
+    class PublishPlugin(AutopubPlugin, AutopubPackageManagerPlugin):
+        def publish(self, repository: str) -> None:
+            nonlocal published
+            published = True
+
+    autopub = Autopub(plugins=[PublishPlugin])
+    autopub.publish()
+
+    assert published

@@ -1,3 +1,4 @@
+import json
 import shutil
 from collections.abc import Generator
 from pathlib import Path
@@ -67,3 +68,21 @@ def example_project_pdm(
         shutil.copytree(project_path, dest, dirs_exist_ok=True)
 
         yield dest
+
+
+@pytest.fixture
+def with_valid_artifact(temporary_working_directory: Path) -> Path:
+    release_file = temporary_working_directory / "RELEASE.md"
+    release_file.write_text("sometext")
+    release_info = temporary_working_directory / ".autopub" / "release_info.json"
+    release_info.parent.mkdir(parents=True)
+
+    data = {
+        "hash": "5fb2054478353fd8d514056d1745b3a9eef066deadda4b90967af7ca65ce6505",
+        "release_notes": "foo",
+        "release_type": "patch",
+        "plugin_data": {},
+    }
+    release_info.write_text(json.dumps(data))
+
+    return release_info
