@@ -66,6 +66,7 @@ autopub = "autopub.cli:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
 
 [tool.autopub]
 project-name = "AutoPub"
