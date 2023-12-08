@@ -12,7 +12,7 @@ def test_post_publish(mocker: MockerFixture) -> None:
     release_info = ReleaseInfoWithVersion(
         release_notes="",
         release_type="major",
-        additional_info={"new_version": "v1.0.0"},
+        additional_info={},
         version="v1.0.0",
         previous_version="v0.0.0",
     )
