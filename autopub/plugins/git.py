@@ -18,4 +18,4 @@ class GitPlugin(AutopubPlugin):
         self.run_command(["git", "add", "--all", "--", ":!main/.autopub"])
         self.run_command(["git", "commit", "-m", "🤖 autopub publish"])
         self.run_command(["git", "push"])
-        self.run_command(["git", "push", tag])
+        self.run_command(["git", "push", "origin", tag])
