@@ -102,7 +102,7 @@ class Autopub:
         self._write_artifact(self.release_data)
 
     def _delete_release_file(self) -> None:
-        self.release_file.unlink()
+        self.release_file.unlink(missing_ok=True)
 
     def publish(self, repository: str | None = None) -> None:
         release_info = self.release_data
