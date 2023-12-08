@@ -46,15 +46,6 @@ class AutopubPlugin:
 
 
 @runtime_checkable
-class AutopubBumpVersionPlugin(Protocol):
-    new_version: str
-    current_version: str
-
-    def post_check(self, release_info: ReleaseInfo) -> None:  # pragma: no cover
-        ...
-
-
-@runtime_checkable
 class AutopubPackageManagerPlugin(Protocol):
     def build(self) -> None:  # pragma: no cover
         ...

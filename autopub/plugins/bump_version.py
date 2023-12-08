@@ -5,14 +5,11 @@ import pathlib
 import tomlkit
 from dunamai import Version
 
-from autopub.plugins import AutopubBumpVersionPlugin, AutopubPlugin
+from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
 
 
-class BumpVersionPlugin(AutopubBumpVersionPlugin, AutopubPlugin):
-    current_version: str
-    new_version: str
-
+class BumpVersionPlugin(AutopubPlugin):
     @property
     def pyproject_config(self) -> tomlkit.TOMLDocument:
         content = pathlib.Path("pyproject.toml").read_text()
@@ -38,9 +35,9 @@ class BumpVersionPlugin(AutopubBumpVersionPlugin, AutopubPlugin):
 
         version = Version(self._get_version(config))
 
-        self.previous_version = str(version)
-        self.new_version = version.bump(bump_type).serialize()
+        release_info.previous_version = str(version)
+        release_info.version = version.bump(bump_type).serialize()
 
-        self._update_version(config, self.new_version)
+        self._update_version(config, release_info.version)
 
         pathlib.Path("pyproject.toml").write_text(tomlkit.dumps(config))  # type: ignore
