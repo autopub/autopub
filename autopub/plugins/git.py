@@ -7,6 +7,9 @@ from autopub.plugins import AutopubPlugin
 
 class GitPlugin(AutopubPlugin):
     def post_publish(self, repository: str | None = None, **kwargs: Any) -> None:
+        self.run_command(["git", "config", "--global", "user.email", "autopub@autopub"])
+        self.run_command(["git", "config", "--global", "user.name", "autopub"])
+
         self.run_command(["git", "add", "."])
 
         self.run_command(["git", "commit", "-m", "🤖 autopub publish"])
