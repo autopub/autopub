@@ -14,11 +14,10 @@ from autopub.exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
-from autopub.plugins import AutopubBumpVersionPlugin
 from autopub.types import ReleaseInfo
 
 
-class VersionPlugin(AutopubPlugin, AutopubBumpVersionPlugin):
+class VersionPlugin(AutopubPlugin):
     def post_check(self, release_info: ReleaseInfo):
         release_info.version = "1.0.1"
         release_info.previous_version = "1.0.0"

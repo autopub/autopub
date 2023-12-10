@@ -1,11 +1,10 @@
 from pathlib import Path
 
 from autopub import Autopub, AutopubPlugin
-from autopub.plugins import AutopubBumpVersionPlugin
 from autopub.types import ReleaseInfo
 
 
-class VersionPlugin(AutopubPlugin, AutopubBumpVersionPlugin):
+class VersionPlugin(AutopubPlugin):
     def post_check(self, release_info: ReleaseInfo):
         self.current_version = "1.0.0"
         self.new_version = "1.0.1"

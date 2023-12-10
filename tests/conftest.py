@@ -42,7 +42,7 @@ def deprecated_release_text() -> str:
     return DEPRECATED_RELEASE_TEXT.strip()
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
     with tmpdir.as_cwd():
         yield Path(tmpdir)
