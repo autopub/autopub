@@ -2,7 +2,7 @@ from typing import Optional, TypedDict
 
 import rich
 import typer
-from rich.console import Group
+from rich.console import Group, RenderableType
 from rich.markdown import Markdown
 from rich.padding import Padding
 from rich.panel import Panel
@@ -10,7 +10,7 @@ from typing_extensions import Annotated
 
 from autopub import Autopub
 from autopub.cli.plugins import find_plugins
-from autopub.exceptions import AutopubException
+from autopub.exceptions import AutopubException, InvalidConfiguration
 
 app = typer.Typer()
 
@@ -27,6 +27,34 @@ def check():
     """This commands checks if the current PR has a valid release file."""
 
     autopub = Autopub(plugins=find_plugins(state["plugins"]))
+
+    try:
+        autopub.validate_config()
+    except InvalidConfiguration as e:
+        title = "[red]🚨 Some of the plugins have invalid configuration[/]"
+
+        parts: list[RenderableType] = []
+
+        for id_ in e.validation_errors:
+            error = e.validation_errors[id_]
+            parts.append("")
+            parts.append(f"[bold]Plugin:[/] {id_}")
+
+            errors: list[RenderableType] = []
+
+            for error in error.errors():
+                location = " -> ".join(map(str, error["loc"]))
+                message = error["msg"]
+
+                errors.append(f"[bold blue]{location}[/]: {message}")
+
+            parts.append(Padding(Group(*errors), (0, 2)))
+
+        content = Group(f"[red]{title}[/]", *parts)
+
+        rich.print(Padding(content, (1, 1)))
+
+        raise typer.Exit(1) from e
 
     try:
         autopub.check()
