@@ -4,13 +4,16 @@ import hashlib
 import json
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Mapping, TypeAlias
 
 import frontmatter
+from pydantic import ValidationError
 
 from autopub.exceptions import (
     ArtifactHashMismatch,
     ArtifactNotFound,
     AutopubException,
+    InvalidConfiguration,
     NoPackageManagerPluginFound,
     ReleaseFileEmpty,
     ReleaseFileNotFound,
@@ -24,8 +27,15 @@ from autopub.plugins import (
 )
 from autopub.types import ReleaseInfo
 
+ConfigValue: TypeAlias = (
+    None | bool | str | float | int | list["ConfigValue"] | Mapping[str, "ConfigValue"]
+)
+
+ConfigType = Mapping[str, ConfigValue]
+
 
 class Autopub:
+    config: ConfigType = {}
     RELEASE_FILE_PATH = "RELEASE.md"
 
     def __init__(self, plugins: Iterable[type[AutopubPlugin]] = ()) -> None:
@@ -101,9 +111,6 @@ class Autopub:
 
         self._write_artifact(release_info)
 
-    def _delete_release_file(self) -> None:
-        self.release_file.unlink(missing_ok=True)
-
     def publish(self, repository: str | None = None) -> None:
         release_info = self.release_info
 
@@ -116,6 +123,21 @@ class Autopub:
             plugin.post_publish(release_info)
 
         self._delete_release_file()
+
+    def validate_config(self) -> None:
+        errors: dict[str, ValidationError] = {}
+
+        for plugin in self.plugins:
+            try:
+                plugin.validate_config(self.config)
+            except ValidationError as e:
+                errors[plugin.id] = e
+
+        if errors:
+            raise InvalidConfiguration(errors)
+
+    def _delete_release_file(self) -> None:
+        self.release_file.unlink(missing_ok=True)
 
     def _write_artifact(self, release_info: ReleaseInfo) -> None:
         data = {

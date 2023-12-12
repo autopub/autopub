@@ -1,3 +1,6 @@
+from pydantic import ValidationError
+
+
 class AutopubException(Exception):
     message: str
 
@@ -44,4 +47,11 @@ class CommandFailed(AutopubException):
         self.message = (
             f"Command {' '.join(command)} failed with return code {returncode}"
         )
+        super().__init__()
+
+
+class InvalidConfiguration(AutopubException):
+    def __init__(self, validation_errors: dict[str, ValidationError]) -> None:
+        self.message = "Invalid configuration"
+        self.validation_errors = validation_errors
         super().__init__()

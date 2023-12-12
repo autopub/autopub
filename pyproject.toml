@@ -3,7 +3,7 @@ requires-python = ">=3.8"
 
 [tool.poetry]
 name = "autopub"
-version = "1.0.0-alpha.18"
+version = "1.0.0-alpha.19"
 description = "Automatic package release upon pull request merge"
 authors = ["Justin Mayer <entroP@gmail.com>", "Patrick Arminio <patrick.arminio@gmail.com>"]
 license = "AGPL-3.0"
@@ -39,6 +39,7 @@ build = "^0.10.0"
 twine = "^4.0.2"
 dunamai = "^1.17.0"
 time-machine = "^2.13.0"
+pydantic = ">=2"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
