@@ -19,14 +19,15 @@ class State(TypedDict):
     plugins: list[str]
 
 
-state: State = {"plugins": []}
+class AutoPubCLI(typer.Context):
+    obj: Autopub
 
 
 @app.command()
-def check():
+def check(context: AutoPubCLI):
     """This commands checks if the current PR has a valid release file."""
 
-    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+    autopub = context.obj
 
     try:
         autopub.validate_config()
@@ -38,7 +39,8 @@ def check():
         for id_ in e.validation_errors:
             error = e.validation_errors[id_]
             parts.append("")
-            parts.append(f"[bold]Plugin:[/] {id_}")
+            parts.append(f"[bold on bright_magenta] Plugin: [/] {id_}")
+            parts.append("")
 
             errors: list[RenderableType] = []
 
@@ -46,7 +48,8 @@ def check():
                 location = " -> ".join(map(str, error["loc"]))
                 message = error["msg"]
 
-                errors.append(f"[bold blue]{location}[/]: {message}")
+                errors.append(f"[bold on blue] {location} [/]: {message}")
+                errors.append("")
 
             parts.append(Padding(Group(*errors), (0, 2)))
 
@@ -82,8 +85,8 @@ def check():
 
 
 @app.command()
-def build():
-    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+def build(context: AutoPubCLI):
+    autopub = context.obj
 
     try:
         autopub.build()
@@ -96,8 +99,8 @@ def build():
 
 
 @app.command()
-def prepare():
-    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+def prepare(context: AutoPubCLI):
+    autopub = context.obj
 
     try:
         autopub.prepare()
@@ -111,12 +114,13 @@ def prepare():
 
 @app.command()
 def publish(
+    context: AutoPubCLI,
     repository: Annotated[
         Optional[str],
         typer.Option("--repository", "-r", help="Repository to publish to"),
     ] = None,
 ):
-    autopub = Autopub(plugins=find_plugins(state["plugins"]))
+    autopub = context.obj
 
     try:
         autopub.publish(repository=repository)
@@ -130,6 +134,7 @@ def publish(
 
 @app.callback(invoke_without_command=True)
 def main(
+    context: AutoPubCLI,
     plugins: list[str] = typer.Option(
         [],
         "--plugin",
@@ -140,8 +145,14 @@ def main(
         Optional[bool], typer.Option("--version", is_eager=True)
     ] = None,
 ):
-    state["plugins"] = plugins
-    state["plugins"].extend(
+    if should_show_version:
+        from importlib.metadata import version
+
+        print(version("autopub"))
+
+        raise typer.Exit()
+
+    plugins.extend(
         [
             "git",
             "update_changelog",
@@ -149,9 +160,6 @@ def main(
         ]
     )
 
-    if should_show_version:
-        from importlib.metadata import version
+    autopub = Autopub(plugins=find_plugins(plugins))
 
-        print(version("autopub"))
-
-        raise typer.Exit()
+    context.obj = autopub
