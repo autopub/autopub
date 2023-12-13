@@ -9,7 +9,6 @@ from rich.panel import Panel
 from typing_extensions import Annotated
 
 from autopub import Autopub
-from autopub.cli.plugins import find_plugins
 from autopub.exceptions import AutopubException, InvalidConfiguration
 
 app = typer.Typer()
@@ -135,12 +134,6 @@ def publish(
 @app.callback(invoke_without_command=True)
 def main(
     context: AutoPubCLI,
-    plugins: list[str] = typer.Option(
-        [],
-        "--plugin",
-        "-p",
-        help="List of plugins to use",
-    ),
     should_show_version: Annotated[
         Optional[bool], typer.Option("--version", is_eager=True)
     ] = None,
@@ -152,14 +145,8 @@ def main(
 
         raise typer.Exit()
 
-    plugins.extend(
-        [
-            "git",
-            "update_changelog",
-            "bump_version",
-        ]
-    )
-
-    autopub = Autopub(plugins=find_plugins(plugins))
+    autopub = Autopub()
+    # default plugins we always want to load (?)
+    autopub.load_plugins(["git", "update_changelog", "bump_version"])
 
     context.obj = autopub

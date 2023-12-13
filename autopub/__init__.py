@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Iterable
+from functools import cached_property
 from pathlib import Path
-from typing import Mapping, TypeAlias
+from typing import Iterable, Mapping, TypeAlias
 
 import frontmatter
+import tomlkit
 from pydantic import ValidationError
 
 from autopub.exceptions import (
@@ -21,6 +22,7 @@ from autopub.exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
+from autopub.plugin_loader import load_plugins
 from autopub.plugins import (
     AutopubPackageManagerPlugin,
     AutopubPlugin,
@@ -35,11 +37,26 @@ ConfigType = Mapping[str, ConfigValue]
 
 
 class Autopub:
-    config: ConfigType = {}
     RELEASE_FILE_PATH = "RELEASE.md"
+    plugins: list[AutopubPlugin]
 
     def __init__(self, plugins: Iterable[type[AutopubPlugin]] = ()) -> None:
         self.plugins = [plugin_class() for plugin_class in plugins]
+
+        self.load_plugins()
+
+    @cached_property
+    def config(self) -> ConfigType:
+        pyproject_path = Path.cwd() / "pyproject.toml"
+
+        if not Path("pyproject.toml").exists():
+            return {}
+
+        content = pyproject_path.read_text()
+
+        data = tomlkit.parse(content)
+
+        return data.get("tool", {}).get("autopub", {})  # type: ignore
 
     @property
     def release_file(self) -> Path:
@@ -68,6 +85,17 @@ class Autopub:
             raise ArtifactHashMismatch()
 
         return ReleaseInfo.from_dict(release_info)
+
+    def load_plugins(self, default_plugins: list[str] | None = None) -> None:
+        default_plugins = default_plugins or []
+
+        additional_plugins: list[str] = self.config.get("plugins", [])  # type: ignore
+
+        all_plugins = default_plugins + additional_plugins
+
+        plugins = load_plugins(all_plugins)
+
+        self.plugins += [plugin_class() for plugin_class in plugins]
 
     def check(self) -> None:
         release_file = Path(self.RELEASE_FILE_PATH)

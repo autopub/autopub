@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from autopub import Autopub, AutopubPlugin
+from autopub import Autopub
 from autopub.exceptions import (
     AutopubException,
     ReleaseFileEmpty,
@@ -14,6 +14,7 @@ from autopub.exceptions import (
     ReleaseTypeInvalid,
     ReleaseTypeMissing,
 )
+from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
 
 

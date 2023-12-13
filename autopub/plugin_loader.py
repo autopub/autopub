@@ -60,7 +60,7 @@ def _find_plugin(plugin: str) -> type[AutopubPlugin] | None:
     return None
 
 
-def find_plugins(names: list[str]) -> list[type[AutopubPlugin]]:
+def load_plugins(names: list[str]) -> list[type[AutopubPlugin]]:
     sys.path.append(os.getcwd())
 
     plugins: list[type] = []

@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from autopub import Autopub, AutopubPlugin
+from autopub import Autopub
+from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
 
 
@@ -30,3 +31,18 @@ def test_can_update_info(temporary_working_directory: Path, valid_release_text: 
     autopub.prepare()
 
     assert autopub.release_info.additional_info["prepared"] is True
+
+
+def test_loads_plugin_from_pyproject_toml(temporary_working_directory: Path):
+    pyproject_toml = temporary_working_directory / "pyproject.toml"
+    pyproject_toml.write_text(
+        """
+        [tool.autopub]
+        plugins = ["git"]
+        """
+    )
+
+    autopub = Autopub()
+
+    assert len(autopub.plugins) == 1
+    assert isinstance(autopub.plugins[0], AutopubPlugin)
