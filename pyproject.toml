@@ -1,8 +1,11 @@
+[project]
+requires-python = ">=3.8"
+
 [tool.poetry]
 name = "autopub"
-version = "0.3.0"
+version = "1.0.0-alpha.20"
 description = "Automatic package release upon pull request merge"
-authors = ["Justin Mayer <entroP@gmail.com>"]
+authors = ["Justin Mayer <entroP@gmail.com>", "Patrick Arminio <patrick.arminio@gmail.com>"]
 license = "AGPL-3.0"
 readme = "README.md"
 keywords = ["automatic", "packaging", "publish", "release", "version"]
@@ -18,17 +21,25 @@ classifiers = [
     "Topic :: System :: Systems Administration",
 ]
 
+include = ["autopub/py.typed"]
+
+
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/autopub/autopub/issues"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 tomlkit = ">= 0.5, < 2.0"
 githubrelease = {version = "^1.5.9", optional = true}
 httpx = {version = "=0.16.1", optional = true}
+typer = "^0.9.0"
+rich = "^12.5.1"
+python-frontmatter = "^1.0.0"
 build = "^0.10.0"
 twine = "^4.0.2"
 dunamai = "^1.17.0"
+time-machine = "^2.13.0"
+pydantic = ">=2"
 
 [tool.poetry.dev-dependencies]
 githubrelease = "^1.5"
@@ -43,24 +54,38 @@ myst-parser = "^0.15"
 Sphinx = "^4.2"
 
 # Linting
-black = {version = "^19.3b0", allow-prereleases = true}
-flake8 = "^3.8"
-flake8-black = "^0.2"
-flake8-bugbear = "^20.0"
-flake8-fixme = "^1.1"
-flake8-markdown = "^0.2.0"
+black = "23.3.0"
+mypy = "^0.971"
+pytest = "^7.1.2"
+pytest-httpserver = "^1.0.8"
 
 [tool.poetry.extras]
 github = ["githubrelease", "httpx"]
 
 [tool.poetry.scripts]
-autopub = "autopub.autopub:main"
+autopub = "autopub.cli:app"
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
 
 [tool.autopub]
 project-name = "AutoPub"
 git-username = "botpub"
 git-email = "52496925+botpub@users.noreply.github.com"
 append-github-contributor = true
+
+
+[tool.ruff]
+select = [
+  "I",
+  "E",
+  "F",
+  "UP",
+]
+exclude = ["typings"]
+force-exclude = true
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

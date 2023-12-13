@@ -1,0 +1,17 @@
+
+[project]
+name = "example-project-pdm"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Patrick Arminio", email = "patrick.arminio@gmail.com"},
+]
+dependencies = []
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

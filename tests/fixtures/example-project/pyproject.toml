@@ -1,0 +1,14 @@
+[tool.poetry]
+authors = ["Patrick Arminio <patrick.arminio@gmail.com>"]
+description = ""
+name = "example-project"
+packages = [{include = "src"}]
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
