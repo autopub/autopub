@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.4.0 - 2024-11-01
+------------------
+
+- Vendor the `githubrelease` project
+- Require Python 3.10+
+
 0.3.0 - 2023-06-07
 ------------------
 
