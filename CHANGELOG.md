@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.3.1 - 2024-11-01
+------------------
+
+* Pin `githubrelease` dependency to specific Git rev hash
+* Drop support for Python 3.7
+
+Contributed by [Chris Rose](https://github.com/offbyone) via [PR #43](https://github.com/autopub/autopub/pull/43/)
+
+
 0.3.0 - 2023-06-07
 ------------------
 
