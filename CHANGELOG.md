@@ -1,12 +1,6 @@
 CHANGELOG
 =========
 
-Unreleased
------------
-
-* vendor [githubrelease](https://github.com/scikit-build/github-release) via [PR TBD](https://github.com/autopub/autopub/pull/TBD)
-* drop support for Python 3.7
-
 0.3.0 - 2023-06-07
 ------------------
 
