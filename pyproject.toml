@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autopub"
-version = "0.3.1"
+version = "0.3.0"
 description = "Automatic package release upon pull request merge"
 authors = ["Justin Mayer <entroP@gmail.com>"]
 license = "AGPL-3.0"
@@ -24,7 +24,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
 tomlkit = ">= 0.5, < 2.0"
-githubrelease = {optional = true, git = "https://github.com/scikit-build/github-release.git", rev = "e80cbe4"}
+githubrelease = {version = "^1.5.9", optional = true}
 httpx = {version = "=0.16.1", optional = true}
 build = "^0.10.0"
 twine = "^4.0.2"
