@@ -5,20 +5,20 @@ import time
 sys.path.append(os.path.dirname(__file__))  # noqa
 
 from base import (
-    run_process,
-    check_exit_code,
-    get_project_version,
-    configure_git,
     PROJECT_NAME,
     REPO_SLUG,
     TAG_PREFIX,
+    check_exit_code,
+    configure_git,
+    get_project_version,
     get_release_info,
+    run_process,
 )
 
 
 def create_github_release():
     try:
-        from github_release import gh_release_create, gh_asset_upload
+        from .vendor.github_release import gh_asset_upload, gh_release_create
     except ModuleNotFoundError:
         print("Cannot create GitHub release due to missing dependency: github_release")
         sys.exit(1)

@@ -24,7 +24,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
 tomlkit = ">= 0.5, < 2.0"
-githubrelease = {version = "^1.5.9", optional = true}
 httpx = {version = "=0.16.1", optional = true}
 build = "^0.10.0"
 twine = "^4.0.2"
