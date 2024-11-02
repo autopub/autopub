@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autopub"
-version = "0.4.0"
+version = "0.4.1"
 description = "Automatic package release upon pull request merge"
 authors = ["Justin Mayer <entroP@gmail.com>"]
 license = "AGPL-3.0"
@@ -23,15 +23,19 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<4.0"
-tomlkit = ">= 0.5, < 2.0"
-httpx = {version = "=0.16.1", optional = true}
-build = "^0.10.0"
-twine = "^4.0.2"
-dunamai = "^1.17.0"
+tomlkit = ">=0.5"
+build = ">=0.10.0"
+twine = ">=4.0.2"
+dunamai = ">=1.17.0"
+
+# Optional GitHub-related dependencies
+backoff = {version = "~=2.1.2", optional = true}
+click = {version = "*", optional = true}
+linkheader = {version = "*", optional = true}
+requests = {version = "*", optional = true}
+httpx = {version = "*", optional = true}
 
 [tool.poetry.dev-dependencies]
-githubrelease = "^1.5"
-
 # Tasks
 invoke = "^1.6"
 
@@ -50,7 +54,7 @@ flake8-fixme = "^1.1"
 flake8-markdown = "^0.2.0"
 
 [tool.poetry.extras]
-github = ["githubrelease", "httpx"]
+github = ["backoff", "click", "linkheader", "requests", "httpx"]
 
 [tool.poetry.scripts]
 autopub = "autopub.autopub:main"
