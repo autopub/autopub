@@ -18,7 +18,7 @@ from base import (
 
 def create_github_release():
     try:
-        from .vendor.github_release import gh_asset_upload, gh_release_create
+        from autopub.vendor.github_release import gh_asset_upload, gh_release_create
     except ModuleNotFoundError:
         print("Cannot create GitHub release due to missing dependency: github_release")
         sys.exit(1)
