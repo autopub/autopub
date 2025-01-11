@@ -71,6 +71,18 @@ def example_project_pdm(
 
 
 @pytest.fixture
+def example_project_uv(
+    temporary_working_directory: Path,
+) -> Generator[Path, None, None]:
+    project_path = Path(__file__).parent / "fixtures/example-project-uv"
+
+    with temporary_working_directory as dest:
+        shutil.copytree(project_path, dest, dirs_exist_ok=True)
+
+        yield dest
+
+
+@pytest.fixture
 def with_valid_artifact(temporary_working_directory: Path) -> Path:
     release_file = temporary_working_directory / "RELEASE.md"
     release_file.write_text("sometext")
