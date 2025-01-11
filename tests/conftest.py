@@ -52,10 +52,9 @@ def temporary_working_directory(tmpdir: Any) -> Generator[Path, None, None]:
 def example_project(temporary_working_directory: Path) -> Generator[Path, None, None]:
     project_path = Path(__file__).parent / "fixtures/example-project"
 
-    with temporary_working_directory as dest:
-        shutil.copytree(project_path, dest, dirs_exist_ok=True)
+    shutil.copytree(project_path, temporary_working_directory, dirs_exist_ok=True)
 
-        yield dest
+    yield temporary_working_directory
 
 
 @pytest.fixture
@@ -64,10 +63,9 @@ def example_project_pdm(
 ) -> Generator[Path, None, None]:
     project_path = Path(__file__).parent / "fixtures/example-project-pdm"
 
-    with temporary_working_directory as dest:
-        shutil.copytree(project_path, dest, dirs_exist_ok=True)
+    shutil.copytree(project_path, temporary_working_directory, dirs_exist_ok=True)
 
-        yield dest
+    yield temporary_working_directory
 
 
 @pytest.fixture
@@ -76,10 +74,9 @@ def example_project_uv(
 ) -> Generator[Path, None, None]:
     project_path = Path(__file__).parent / "fixtures/example-project-uv"
 
-    with temporary_working_directory as dest:
-        shutil.copytree(project_path, dest, dirs_exist_ok=True)
+    shutil.copytree(project_path, temporary_working_directory, dirs_exist_ok=True)
 
-        yield dest
+    yield temporary_working_directory
 
 
 @pytest.fixture
