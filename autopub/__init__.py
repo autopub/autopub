@@ -140,7 +140,11 @@ class Autopub:
         self._write_artifact(release_info)
 
     def publish(self, repository: str | None = None) -> None:
+        print("🛺 publishing")
         release_info = self.release_info
+
+        print("release info", release_info)
+        print("plugins", self.plugins)
 
         for plugin in self.plugins:
             # TODO: maybe pass release info to publish method?
