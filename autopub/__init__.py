@@ -40,11 +40,6 @@ class Autopub:
     RELEASE_FILE_PATH = "RELEASE.md"
     plugins: list[AutopubPlugin]
 
-    def __init__(self, plugins: Iterable[type[AutopubPlugin]] = ()) -> None:
-        self.plugins = [plugin_class() for plugin_class in plugins]
-
-        self.load_plugins()
-
     @cached_property
     def config(self) -> ConfigType:
         pyproject_path = Path.cwd() / "pyproject.toml"
@@ -87,6 +82,7 @@ class Autopub:
         return ReleaseInfo.from_dict(release_info)
 
     def load_plugins(self, default_plugins: list[str] | None = None) -> None:
+        print("🦆 loading plugins")
         default_plugins = default_plugins or []
 
         additional_plugins: list[str] = self.config.get("plugins", [])  # type: ignore
