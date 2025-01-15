@@ -38,6 +38,11 @@ class BumpVersionPlugin(AutopubPlugin):
         release_info.previous_version = str(version)
         release_info.version = version.bump(bump_type).serialize()
 
+    def post_prepare(self, release_info: ReleaseInfo) -> None:
+        config = self.pyproject_config
+
+        assert release_info.version is not None
+
         self._update_version(config, release_info.version)
 
         pathlib.Path("pyproject.toml").write_text(tomlkit.dumps(config))  # type: ignore
