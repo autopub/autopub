@@ -94,6 +94,7 @@ class Autopub:
         all_plugins = default_plugins + additional_plugins
 
         plugins = load_plugins(all_plugins)
+        print("plugins", plugins)
 
         self.plugins += [plugin_class() for plugin_class in plugins]
 

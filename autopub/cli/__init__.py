@@ -146,6 +146,7 @@ def main(
         raise typer.Exit()
 
     autopub = Autopub()
+    print("🤙 loading plugins")
     # default plugins we always want to load (?)
     autopub.load_plugins(["git", "update_changelog", "bump_version"])
 

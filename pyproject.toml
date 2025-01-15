@@ -1,6 +1,6 @@
 [project]
 requires-python = ">=3.9.0,<4.0"
-version = "1.0.0-alpha.28"
+version = "1.0.0-alpha.29"
 name = "autopub"
 description = "Automatic package release upon pull request merge"
 authors = [
@@ -25,7 +25,7 @@ classifiers = [
 repository = "https://github.com/autopub/autopub"
 include = ["autopub/py.typed"]
 name = "autopub"
-version = "1.0.0-alpha.28"
+version = "1.0.0-alpha.29"
 description = "Automatic package release upon pull request merge"
 authors = [
     "Justin Mayer <entroP@gmail.com>",
