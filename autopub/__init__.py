@@ -40,6 +40,9 @@ class Autopub:
     RELEASE_FILE_PATH = "RELEASE.md"
     plugins: list[AutopubPlugin]
 
+    def __init__(self) -> None:
+        self.plugins = []
+
     @cached_property
     def config(self) -> ConfigType:
         pyproject_path = Path.cwd() / "pyproject.toml"
