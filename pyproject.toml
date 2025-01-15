@@ -1,7 +1,7 @@
 [project]
 requires-python = ">=3.9.0,<4.0"
+version = "1.0.0-alpha.25"
 name = "autopub"
-version = "1.0.0-alpha.21"
 description = "Automatic package release upon pull request merge"
 authors = [
     { name = "Justin Mayer", email = "entroP@gmail.com" },
@@ -25,7 +25,7 @@ classifiers = [
 repository = "https://github.com/autopub/autopub"
 include = ["autopub/py.typed"]
 name = "autopub"
-version = "1.0.0-alpha.21"
+version = "1.0.0-alpha.25"
 description = "Automatic package release upon pull request merge"
 authors = [
     "Justin Mayer <entroP@gmail.com>",
@@ -41,6 +41,8 @@ python-frontmatter = "^1.1.0"
 tomlkit = "^0.13.2"
 pydantic = "^2.10.5"
 dunamai = "^1.23.0"
+rich = "^13.9.4"
+typer = "^0.15.1"
 
 
 [tool.poetry.dev-dependencies]
@@ -55,7 +57,6 @@ invoke = "^1.6"
 # Docs
 furo = "^2021.9.22"
 livereload = "^2.6"
-myst-parser = "^0.15"
 Sphinx = "^4.2"
 
 # Linting
