@@ -151,8 +151,6 @@ class Autopub:
             plugin.post_publish(release_info)
 
         self._delete_release_file()
-        self._commit()
-        self._push()
 
     def validate_config(self) -> None:
         errors: dict[str, ValidationError] = {}
