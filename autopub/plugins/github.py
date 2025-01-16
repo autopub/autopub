@@ -85,9 +85,6 @@ class GithubPlugin(AutopubPlugin):
             raise AutopubException("GITHUB_TOKEN environment variable is required")
 
         self.repository_name = os.environ.get("GITHUB_REPOSITORY")
-        self.discussion_category_name = os.environ.get(
-            "DISCUSSION_CATEGORY_NAME", self.configuration.discussion_category
-        )
 
     @cached_property
     def _github(self) -> Github:
@@ -265,11 +262,11 @@ class GithubPlugin(AutopubPlugin):
         )
 
         for node in response["data"]["repository"]["discussionCategories"]["nodes"]:
-            if node["name"] == self.discussion_category_name:
+            if node["name"] == self.config.discussion_category:
                 return node["id"]
 
         raise AutopubException(
-            f"Discussion category {self.discussion_category_name} not found"
+            f"Discussion category {self.config.discussion_category} not found"
         )
 
     def _create_discussion(self, release_info: ReleaseInfo) -> str:
@@ -330,19 +327,19 @@ class GithubPlugin(AutopubPlugin):
 
         changelog = self._get_release_message(release_info)
 
-        message = self.configuration.comment_template_success.format(
+        message = self.config.comment_template_success.format(
             changelog=changelog
         )
 
         self._update_or_create_comment(message)
 
     def on_release_file_not_found(self) -> None:
-        message = self.configuration.comment_template_missing_release
+        message = self.config.comment_template_missing_release
 
         self._update_or_create_comment(message)
 
     def on_release_notes_invalid(self, exception: AutopubException) -> None:
-        message = self.configuration.comment_template_error.format(error=str(exception))
+        message = self.config.comment_template_error.format(error=str(exception))
 
         self._update_or_create_comment(message)
 
@@ -381,7 +378,7 @@ class GithubPlugin(AutopubPlugin):
             reviewers = [f"@{reviewer}" for reviewer in contributors["reviewers"]]
             message += f"\n\nReviewers: {', '.join(reviewers)}"
 
-        if self.configuration.include_sponsors:
+        if self.config.include_sponsors:
             sponsors = self._get_sponsors()
             if sponsors["sponsors"]:
                 public_sponsors = [f"@{sponsor}" for sponsor in sponsors["sponsors"]]
@@ -424,7 +421,7 @@ class GithubPlugin(AutopubPlugin):
 
         discussion_url = None
 
-        if self.configuration.create_discussions:
+        if self.config.create_discussions:
             discussion_url = self._create_discussion(release_info)
 
         self._create_release(release_info, discussion_url)

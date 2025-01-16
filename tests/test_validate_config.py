@@ -20,8 +20,8 @@ def test_validate_config_nothing_to_do():
 
     plugin = autopub.plugins[0]
 
-    assert isinstance(plugin.configuration, PluginWithConfig.Config)
-    assert plugin.configuration.my_config == "default"
+    assert isinstance(plugin.config, PluginWithConfig.Config)
+    assert plugin.config.my_config == "default"
 
 
 def test_validate_config():
@@ -39,8 +39,8 @@ def test_validate_config():
 
     plugin = autopub.plugins[0]
 
-    assert isinstance(plugin.configuration, PluginWithConfig.Config)
-    assert plugin.configuration.my_config == "value"
+    assert isinstance(plugin.config, PluginWithConfig.Config)
+    assert plugin.config.my_config == "value"
 
 
 def test_validate_config_invalid():

@@ -27,7 +27,13 @@ class AutopubPlugin:
 
         plugin_config = config.get(self.id, {})
 
-        self.configuration = configuration_class.model_validate(plugin_config)
+        self._config = configuration_class.model_validate(plugin_config)
+
+    @property
+    def config(self) -> ConfigType:
+        self.validate_config()
+
+        return self._config
 
     def run_command(self, command: list[str]) -> None:
         try:
