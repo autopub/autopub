@@ -35,6 +35,7 @@ dev = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
     "pytest-httpserver>=1.1.0",
+    "pytest-mock>=3.14.0",
     "time-machine>=2.16.0",
 ]
 
