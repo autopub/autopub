@@ -54,6 +54,9 @@ class AutopubPlugin:
     ) -> None:  # pragma: no cover
         ...
 
+    def on_release_file_not_found(self) -> None:  # pragma: no cover
+        ...
+
     def on_release_notes_invalid(
         self, exception: AutopubException
     ) -> None:  # pragma: no cover

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from functools import cached_property
 from pathlib import Path
-from typing import Iterable, Mapping, TypeAlias
+from typing import TypeAlias
 
 import frontmatter
 import tomlkit
@@ -101,6 +102,9 @@ class Autopub:
         release_file = Path(self.RELEASE_FILE_PATH)
 
         if not release_file.exists():
+            for plugin in self.plugins:
+                plugin.on_release_file_not_found()
+                
             raise ReleaseFileNotFound()
 
         try:
@@ -111,10 +115,10 @@ class Autopub:
             raise
 
         for plugin in self.plugins:
-            plugin.on_release_notes_valid(release_info)
-
-        for plugin in self.plugins:
             plugin.post_check(release_info)
+        
+        for plugin in self.plugins:
+            plugin.on_release_notes_valid(release_info)
 
         self._write_artifact(release_info)
 

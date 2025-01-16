@@ -34,7 +34,7 @@ class GithubConfig(BaseModel):
         Here's a preview of the changelog:
 
         {changelog}
-    """,
+        """,
     )
 
     comment_template_error: str = textwrap.dedent(
@@ -44,8 +44,7 @@ class GithubConfig(BaseModel):
         Here's the error:
 
         {error}
-    """,
-        description="Template for release note validation errors",
+        """,
     )
 
     comment_template_missing_release: str = textwrap.dedent("""
@@ -66,7 +65,11 @@ class GithubConfig(BaseModel):
 
         Release type can be one of patch, minor or major. We use [semver](https://semver.org/), so make sure to pick the appropriate type. If in doubt feel free to ask :)
         ```
-    """)
+        """)
+
+    include_sponsors: bool = True
+    create_discussions: bool = True
+    discussion_category: str = "Announcements"
 
 
 class GithubPlugin(AutopubPlugin):
@@ -83,7 +86,7 @@ class GithubPlugin(AutopubPlugin):
 
         self.repository_name = os.environ.get("GITHUB_REPOSITORY")
         self.discussion_category_name = os.environ.get(
-            "DISCUSSION_CATEGORY_NAME", "Announcements"
+            "DISCUSSION_CATEGORY_NAME", self.configuration.discussion_category
         )
 
     @cached_property
@@ -269,18 +272,19 @@ class GithubPlugin(AutopubPlugin):
             f"Discussion category {self.discussion_category_name} not found"
         )
 
-    def _create_discussion(self, release_info: ReleaseInfo) -> None:
+    def _create_discussion(self, release_info: ReleaseInfo) -> str:
         mutation = """
         mutation CreateDiscussion($repositoryId: ID!, $categoryId: ID!, $body: String!, $title: String!) {
             createDiscussion(input: {repositoryId: $repositoryId, categoryId: $categoryId, body: $body, title: $title}) {
                 discussion {
                     id
+                    url
                 }
             }
         }
         """
 
-        self._github.requester.graphql_query(
+        _, response = self._github.requester.graphql_query(
             mutation,
             {
                 # TODO: repo.node_id is not yet been published to pypi
@@ -290,6 +294,8 @@ class GithubPlugin(AutopubPlugin):
                 "title": f"Release {release_info.version}",
             },
         )
+
+        return response["data"]["createDiscussion"]["discussion"]["url"]
 
     def _get_pr_contributors(self) -> PRContributors:
         pr: PullRequest = self.pull_request
@@ -330,26 +336,37 @@ class GithubPlugin(AutopubPlugin):
 
         self._update_or_create_comment(message)
 
+    def on_release_file_not_found(self) -> None:
+        message = self.configuration.comment_template_missing_release
+
+        self._update_or_create_comment(message)
+
     def on_release_notes_invalid(self, exception: AutopubException) -> None:
         message = self.configuration.comment_template_error.format(error=str(exception))
 
         self._update_or_create_comment(message)
 
-    def _get_release_message(self, release_info: ReleaseInfo) -> str:
+    def _get_release_message(
+        self,
+        release_info: ReleaseInfo,
+        include_release_info: bool = False,
+        discussion_url: Optional[str] = None,
+    ) -> str:
         assert self.pull_request is not None
 
         contributors = self._get_pr_contributors()
-        sponsors = self._get_sponsors()
-
         message = textwrap.dedent(
             f"""
             ## {release_info.version}
 
             {release_info.release_notes}
-
-            This release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}
             """
         )
+
+        if not include_release_info:
+            return message
+
+        message += f"This release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
 
         if contributors["additional_contributors"]:
             additional_contributors = [
@@ -364,18 +381,28 @@ class GithubPlugin(AutopubPlugin):
             reviewers = [f"@{reviewer}" for reviewer in contributors["reviewers"]]
             message += f"\n\nReviewers: {', '.join(reviewers)}"
 
-        if sponsors["sponsors"]:
-            sponsors = [f"@{sponsor}" for sponsor in sponsors["sponsors"]]
-            message += f"\n\nThanks to {', '.join(sponsors)}"
-            if sponsors["private_sponsors"]:
-                message += f" and the {sponsors['private_sponsors']} private sponsor(s)"
+        if self.configuration.include_sponsors:
+            sponsors = self._get_sponsors()
+            if sponsors["sponsors"]:
+                public_sponsors = [f"@{sponsor}" for sponsor in sponsors["sponsors"]]
+                message += f"\n\nThanks to {', '.join(public_sponsors)}"
 
-            message += " for making this release possible ✨"
+                if sponsors["private_sponsors"]:
+                    message += (
+                        f" and the {sponsors['private_sponsors']} private sponsor(s)"
+                    )
+
+                message += " for making this release possible ✨"
+
+        if discussion_url:
+            message += f"\n\nJoin the discussion: {discussion_url}"
 
         return message
 
-    def _create_release(self, release_info: ReleaseInfo) -> None:
-        message = self._get_release_message(release_info)
+    def _create_release(
+        self, release_info: ReleaseInfo, discussion_url: Optional[str] = None
+    ) -> None:
+        message = self._get_release_message(release_info, discussion_url=discussion_url)
 
         release = self.repository.create_git_release(
             tag=release_info.version,
@@ -395,5 +422,9 @@ class GithubPlugin(AutopubPlugin):
             text, marker="<!-- autopub-comment-published -->"
         )
 
-        self._create_release(release_info)
-        self._create_discussion(release_info)
+        discussion_url = None
+
+        if self.configuration.create_discussions:
+            discussion_url = self._create_discussion(release_info)
+
+        self._create_release(release_info, discussion_url)
