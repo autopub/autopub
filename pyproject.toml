@@ -20,62 +20,37 @@ classifiers = [
     "Topic :: System :: Software Distribution",
     "Topic :: System :: Systems Administration",
 ]
+dependencies = [
+    "dunamai>=1.23.0",
+    "pydantic>=2.10.5",
+    "pygithub>=2.5.0",
+    "python-frontmatter>=1.1.0",
+    "rich>=13.9.4",
+    "tomlkit>=0.13.2",
+    "typer>=0.15.1",
+] 
 
-[tool.poetry]
-repository = "https://github.com/autopub/autopub"
-include = ["autopub/py.typed"]
-name = "autopub"
-version = "1.0.0-alpha.46"
-description = "Automatic package release upon pull request merge"
-authors = [
-    "Justin Mayer <entroP@gmail.com>",
-    "Patrick Arminio <patrick.arminio@gmail.com>",
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-httpserver>=1.1.0",
+    "time-machine>=2.16.0",
 ]
 
-[tool.poetry.urls]
-"Issue Tracker" = "https://github.com/autopub/autopub/issues"
-
-[tool.poetry.dependencies]
-python = ">=3.9.0,<4.0"
-python-frontmatter = "^1.1.0"
-tomlkit = "^0.13.2"
-pydantic = "^2.10.5"
-dunamai = "^1.23.0"
-rich = "^13.9.4"
-typer = "^0.15.1"
-pygithub = "^2.5.0"
-
-
-[tool.poetry.dev-dependencies]
-backoff = { version = "~=2.1.2", optional = true }
-click = { version = "*", optional = true }
-linkheader = { version = "*", optional = true }
-requests = { version = "*", optional = true }
-httpx = { version = "*", optional = true }
-# Tasks
-invoke = "^1.6"
-
-# Docs
-furo = "^2021.9.22"
-livereload = "^2.6"
-Sphinx = "^4.2"
-
-# Linting
-black = "23.3.0"
-mypy = "^0.971"
-pytest = "^7.1.2"
-pytest-httpserver = "^1.0.8"
-
-[tool.poetry.extras]
-github = ["backoff", "click", "linkheader", "requests", "httpx"]
-
-[tool.poetry.scripts]
+[project.scripts]
 autopub = "autopub.cli:app"
 
-[tool.poetry.group.dev.dependencies]
-pytest-cov = "^4.1.0"
-pytest-mock = "^3.12.0"
-time-machine = "^2.16.0"
+[project.urls]
+Source = "https://github.com/autopub/autopub"
+Issues = "https://github.com/autopub/autopub/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["autopub"]
 
 [tool.autopub]
 project-name = "AutoPub"
@@ -83,14 +58,8 @@ git-username = "botpub"
 git-email = "52496925+botpub@users.noreply.github.com"
 append-github-contributor = true
 
-
 [tool.ruff]
 select = ["I", "E", "F", "UP"]
 ignore = ["E501"]
 exclude = ["typings"]
 force-exclude = true
-
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
