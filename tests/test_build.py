@@ -34,8 +34,7 @@ def test_works_with_build_plugin():
 def test_works_with_build_plugin_and_other_plugin():
     built = False
 
-    class ANonBuildPlugin(AutopubPlugin):
-        ...
+    class ANonBuildPlugin(AutopubPlugin): ...
 
     class ABuildPlugin(AutopubPlugin):
         def build(self):

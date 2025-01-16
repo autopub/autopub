@@ -7,8 +7,7 @@ from importlib import import_module
 from autopub.plugins import AutopubPlugin
 
 
-class PluginNotFoundError(Exception):
-    ...
+class PluginNotFoundError(Exception): ...
 
 
 def _is_autopub_plugin(obj: object) -> bool:

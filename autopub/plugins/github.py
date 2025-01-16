@@ -8,6 +8,7 @@ from typing import Optional, TypedDict
 from github import Github
 from github.PullRequest import PullRequest
 from github.Repository import Repository
+from pydantic import BaseModel
 
 from autopub.exceptions import AutopubException
 from autopub.plugins import AutopubPlugin
@@ -25,19 +26,65 @@ class Sponsors(TypedDict):
     private_sponsors: int
 
 
+class GithubConfig(BaseModel):
+    comment_template_success: str = textwrap.dedent(
+        """
+        Thanks for adding the `RELEASE.md` file!
+
+        Here's a preview of the changelog:
+
+        {changelog}
+    """,
+    )
+
+    comment_template_error: str = textwrap.dedent(
+        """
+        Something went wrong while checking the release file.
+
+        Here's the error:
+
+        {error}
+    """,
+        description="Template for release note validation errors",
+    )
+
+    comment_template_missing_release: str = textwrap.dedent("""
+        Hi, thanks for contributing to this project!
+
+        We noticed that this PR is missing a `RELEASE.md` file. We use that to automatically do releases here on GitHub and, most importantly, to PyPI!
+
+        So as soon as this PR is merged, a release will be made 🚀.
+
+        Here's an example of `RELEASE.md`:
+
+        ```markdown
+        ---
+        release type: patch
+        ---
+
+        Description of the changes, ideally with some examples, if adding a new feature.
+
+        Release type can be one of patch, minor or major. We use [semver](https://semver.org/), so make sure to pick the appropriate type. If in doubt feel free to ask :)
+        ```
+    """)
+
+
 class GithubPlugin(AutopubPlugin):
-    # TODO: think about the config
+    id = "github"
+    Config = GithubConfig
+
     def __init__(self) -> None:
         super().__init__()
-        
+
         self.github_token = os.environ.get("GITHUB_TOKEN")
-        
+
         if not self.github_token:
             raise AutopubException("GITHUB_TOKEN environment variable is required")
 
         self.repository_name = os.environ.get("GITHUB_REPOSITORY")
-        # TODO: maybe this should be in a config file?
-        self.discussion_category_name = os.environ.get("DISCUSSION_CATEGORY_NAME", "Announcements")
+        self.discussion_category_name = os.environ.get(
+            "DISCUSSION_CATEGORY_NAME", "Announcements"
+        )
 
     @cached_property
     def _github(self) -> Github:
@@ -57,9 +104,9 @@ class GithubPlugin(AutopubPlugin):
         return self._github.get_repo(self.repository_name)
 
     @cached_property
-    def pull_request(self) -> Optional[PullRequest]:    
+    def pull_request(self) -> Optional[PullRequest]:
         pr_number = self._get_pr_number()
-        
+
         if pr_number is None:
             return None
 
@@ -95,7 +142,9 @@ class GithubPlugin(AutopubPlugin):
         self, text: str, marker: str = "<!-- autopub-comment -->"
     ) -> None:
         """Update or create a comment on the current PR with the given text."""
-        print(f"Updating or creating comment on PR {self.pull_request} in {self.repository}")
+        print(
+            f"Updating or creating comment on PR {self.pull_request} in {self.repository}"
+        )
 
         # Look for existing autopub comment
         comment_body = f"{marker}\n{text}"
@@ -162,6 +211,7 @@ class GithubPlugin(AutopubPlugin):
         """
 
         # TODO: there might be some permission issues in some cases
+        # TODO: this needs a PAT (check security implications)
         if self.repository.organization:
             _, response = self._github.requester.graphql_query(
                 query_organisation, {"organization": self.repository.organization.login}
@@ -190,7 +240,6 @@ class GithubPlugin(AutopubPlugin):
         )
 
     def _get_discussion_category_id(self) -> str:
-
         query = """
             query GetDiscussionCategoryId($owner: String!, $repositoryName: String!) {
                 repository(owner: $owner, name: $repositoryName) {
@@ -216,7 +265,9 @@ class GithubPlugin(AutopubPlugin):
             if node["name"] == self.discussion_category_name:
                 return node["id"]
 
-        raise AutopubException(f"Discussion category {self.discussion_category_name} not found")
+        raise AutopubException(
+            f"Discussion category {self.discussion_category_name} not found"
+        )
 
     def _create_discussion(self, release_info: ReleaseInfo) -> None:
         mutation = """
@@ -268,36 +319,21 @@ class GithubPlugin(AutopubPlugin):
 
         return pr_contributors
 
-    def on_release_notes_valid(
-        self, release_info: ReleaseInfo
-    ) -> None:  # pragma: no cover
+    def on_release_notes_valid(self, release_info: ReleaseInfo) -> None:
         assert self.pull_request is not None
 
-        contributors = self._get_pr_contributors()
-        sponsors = self._get_sponsors()
-        discussion_category_id = self._get_discussion_category_id()
+        changelog = self._get_release_message(release_info)
 
-        message = textwrap.dedent(
-            f"""
-            ## {release_info.version}
-
-            {release_info.release_notes}
-
-            This release was contributed by {contributors} in #{self.pull_request.number}
-
-            Sponsors: {sponsors}
-
-            Discussion: {discussion_category_id}
-            """
+        message = self.configuration.comment_template_success.format(
+            changelog=changelog
         )
 
         self._update_or_create_comment(message)
 
-    def on_release_notes_invalid(
-        self, exception: AutopubException
-    ) -> None:  # pragma: no cover
-        # TODO: better message
-        self._update_or_create_comment(str(exception))
+    def on_release_notes_invalid(self, exception: AutopubException) -> None:
+        message = self.configuration.comment_template_error.format(error=str(exception))
+
+        self._update_or_create_comment(message)
 
     def _get_release_message(self, release_info: ReleaseInfo) -> str:
         assert self.pull_request is not None
@@ -316,8 +352,13 @@ class GithubPlugin(AutopubPlugin):
         )
 
         if contributors["additional_contributors"]:
-            additional_contributors = [f"@{contributor}" for contributor in contributors["additional_contributors"]]
-            message += f"\n\nAdditional contributors: {', '.join(additional_contributors)}"
+            additional_contributors = [
+                f"@{contributor}"
+                for contributor in contributors["additional_contributors"]
+            ]
+            message += (
+                f"\n\nAdditional contributors: {', '.join(additional_contributors)}"
+            )
 
         if contributors["reviewers"]:
             reviewers = [f"@{reviewer}" for reviewer in contributors["reviewers"]]
