@@ -19,20 +19,21 @@ class AutopubPlugin:
     id: str
     data: dict[str, object] = {}
 
+    _config: ConfigType | None = None
+
     def validate_config(self, config: ConfigType):
         configuration_class: type[BaseModel] | None = getattr(self, "Config", None)
 
         if configuration_class is None:
             return
 
-        plugin_config = config.get(self.id, {})
+        plugin_config = config.get("plugin_config", {}).get(self.id, {})
 
         self._config = configuration_class.model_validate(plugin_config)
 
     @property
     def config(self) -> ConfigType:
-        self.validate_config()
-
+        assert self._config is not None
         return self._config
 
     def run_command(self, command: list[str]) -> None:

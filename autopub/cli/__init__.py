@@ -29,36 +29,6 @@ def check(context: AutoPubCLI):
     autopub = context.obj
 
     try:
-        autopub.validate_config()
-    except InvalidConfiguration as e:
-        title = "[red]🚨 Some of the plugins have invalid configuration[/]"
-
-        parts: list[RenderableType] = []
-
-        for id_ in e.validation_errors:
-            error = e.validation_errors[id_]
-            parts.append("")
-            parts.append(f"[bold on bright_magenta] Plugin: [/] {id_}")
-            parts.append("")
-
-            errors: list[RenderableType] = []
-
-            for error in error.errors():
-                location = " -> ".join(map(str, error["loc"]))
-                message = error["msg"]
-
-                errors.append(f"[bold on blue] {location} [/]: {message}")
-                errors.append("")
-
-            parts.append(Padding(Group(*errors), (0, 2)))
-
-        content = Group(f"[red]{title}[/]", *parts)
-
-        rich.print(Padding(content, (1, 1)))
-
-        raise typer.Exit(1) from e
-
-    try:
         autopub.check()
     except AutopubException as e:
         rich.print(Panel.fit(f"[red]{e.message}"))
@@ -146,8 +116,39 @@ def main(
         raise typer.Exit()
 
     autopub = Autopub()
-    print("🤙 loading plugins")
+    
+    
     # default plugins we always want to load (?)
     autopub.load_plugins(["git", "update_changelog", "bump_version"])
+
+    try:
+        autopub.validate_config()
+    except InvalidConfiguration as e:
+        title = "[red]🚨 Some of the plugins have invalid configuration[/]"
+
+        parts: list[RenderableType] = []
+
+        for id_ in e.validation_errors:
+            error = e.validation_errors[id_]
+            parts.append("")
+            parts.append(f"[bold on bright_magenta] Plugin: [/] {id_}")
+            parts.append("")
+
+            errors: list[RenderableType] = []
+
+            for error in error.errors():
+                location = " -> ".join(map(str, error["loc"]))
+                message = error["msg"]
+
+                errors.append(f"[bold on blue] {location} [/]: {message}")
+                errors.append("")
+
+            parts.append(Padding(Group(*errors), (0, 2)))
+
+        content = Group(f"[red]{title}[/]", *parts)
+
+        rich.print(Padding(content, (1, 1)))
+
+        raise typer.Exit(1) from e
 
     context.obj = autopub

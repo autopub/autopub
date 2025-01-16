@@ -142,11 +142,6 @@ class GithubPlugin(AutopubPlugin):
         self, text: str, marker: str = "<!-- autopub-comment -->"
     ) -> None:
         """Update or create a comment on the current PR with the given text."""
-        print(
-            f"Updating or creating comment on PR {self.pull_request} in {self.repository}"
-        )
-
-        # Look for existing autopub comment
         comment_body = f"{marker}\n{text}"
 
         # Search for existing comment
@@ -354,8 +349,6 @@ class GithubPlugin(AutopubPlugin):
         contributors = self._get_pr_contributors()
         message = textwrap.dedent(
             f"""
-            ## {release_info.version}
-
             {release_info.release_notes}
             """
         )
@@ -399,7 +392,11 @@ class GithubPlugin(AutopubPlugin):
     def _create_release(
         self, release_info: ReleaseInfo, discussion_url: Optional[str] = None
     ) -> None:
-        message = self._get_release_message(release_info, discussion_url=discussion_url)
+        message = self._get_release_message(
+            release_info,
+            include_release_info=True,
+            discussion_url=discussion_url,
+        )
 
         release = self.repository.create_git_release(
             tag=release_info.version,
@@ -408,7 +405,7 @@ class GithubPlugin(AutopubPlugin):
         )
 
         for asset in pathlib.Path("dist").glob("*"):
-            if asset.suffix in [".tar.gz", ".whl"]:
+            if asset.suffix in [".gz", ".whl"]:
                 release.upload_asset(str(asset))
 
     def post_publish(self, release_info: ReleaseInfo) -> None:
@@ -424,4 +421,4 @@ class GithubPlugin(AutopubPlugin):
         if self.config.create_discussions:
             discussion_url = self._create_discussion(release_info)
 
-        self._create_release(release_info, discussion_url)
+        self._create_release(release_info, discussion_url=discussion_url)
