@@ -166,15 +166,19 @@ class GithubPlugin(AutopubPlugin):
             _, response = self._github.requester.graphql_query(
                 query_organisation, {"organization": self.repository.organization.login}
             )
+
+            data = response["data"]["organization"]["sponsorshipsAsMaintainer"]["nodes"]
         else:
             _, response = self._github.requester.graphql_query(
                 query_user, {"user": self.repository.owner.login}
             )
 
+            data = response["data"]["user"]["sponsorshipsAsMaintainer"]["nodes"]
+
         sponsors = set()
         private_sponsors = 0
 
-        for node in response["data"]["organization"]["sponsorshipsAsMaintainer"]["nodes"]:
+        for node in data:
             if node["privacyLevel"] == "PUBLIC":
                 sponsors.add(node["sponsorEntity"]["login"])
             else:
