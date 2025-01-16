@@ -104,7 +104,7 @@ class Autopub:
         if not release_file.exists():
             for plugin in self.plugins:
                 plugin.on_release_file_not_found()
-                
+
             raise ReleaseFileNotFound()
 
         try:
@@ -116,7 +116,7 @@ class Autopub:
 
         for plugin in self.plugins:
             plugin.post_check(release_info)
-        
+
         for plugin in self.plugins:
             plugin.on_release_notes_valid(release_info)
 

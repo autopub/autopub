@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import Annotated, Optional, TypedDict
 
 import rich
 import typer
@@ -6,7 +6,6 @@ from rich.console import Group, RenderableType
 from rich.markdown import Markdown
 from rich.padding import Padding
 from rich.panel import Panel
-from typing_extensions import Annotated
 
 from autopub import Autopub
 from autopub.exceptions import AutopubException, InvalidConfiguration
@@ -116,8 +115,7 @@ def main(
         raise typer.Exit()
 
     autopub = Autopub()
-    
-    
+
     # default plugins we always want to load (?)
     autopub.load_plugins(["git", "update_changelog", "bump_version"])
 

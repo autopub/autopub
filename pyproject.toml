@@ -86,6 +86,7 @@ append-github-contributor = true
 
 [tool.ruff]
 select = ["I", "E", "F", "UP"]
+ignore = ["E501"]
 exclude = ["typings"]
 force-exclude = true
 

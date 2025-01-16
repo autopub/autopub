@@ -322,9 +322,7 @@ class GithubPlugin(AutopubPlugin):
 
         changelog = self._get_release_message(release_info)
 
-        message = self.config.comment_template_success.format(
-            changelog=changelog
-        )
+        message = self.config.comment_template_success.format(changelog=changelog)
 
         self._update_or_create_comment(message)
 

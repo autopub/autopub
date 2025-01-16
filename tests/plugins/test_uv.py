@@ -1,4 +1,3 @@
-import subprocess
 from pathlib import Path
 
 from pytest_httpserver import HTTPServer
