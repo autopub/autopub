@@ -19,13 +19,13 @@ class GitPlugin(AutopubPlugin):
 
         commit_message = textwrap.dedent(
             f"""
-            Release {release_info.version}
+            🤖 Release {release_info.version}
 
             {release_info.release_notes}
 
             [skip ci]
             """
-        )
+        ).strip()
 
         # TODO: config?
         self.run_command(["git", "rm", "RELEASE.md"])

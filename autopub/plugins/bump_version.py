@@ -38,8 +38,6 @@ class BumpVersionPlugin(AutopubPlugin):
         release_info.previous_version = str(version)
         release_info.version = version.bump(bump_type).serialize()
 
-        print("👊 bumped version to", release_info.version)
-
     def post_prepare(self, release_info: ReleaseInfo) -> None:
         config = self.pyproject_config
 

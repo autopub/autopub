@@ -14,6 +14,7 @@ def test_bumps_version_in_pyproject(example_project_pdm: Path):
 
     plugin = BumpVersionPlugin()
     plugin.post_check(info)
+    plugin.post_prepare(info)
 
     assert 'version = "0.2.0"' in (example_project_pdm / "pyproject.toml").read_text()
 
@@ -28,5 +29,6 @@ def test_bumps_version_in_pyproject_poetry(example_project: Path):
 
     plugin = BumpVersionPlugin()
     plugin.post_check(info)
+    plugin.post_prepare(info)
 
     assert 'version = "0.2.0"' in (example_project / "pyproject.toml").read_text()

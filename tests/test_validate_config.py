@@ -33,7 +33,9 @@ def test_validate_config():
 
     autopub = Autopub(plugins=[PluginWithConfig])
 
-    autopub.config = {"plugin_with_config": {"my_config": "value"}}
+    autopub.config = {
+        "plugin_config": {"plugin_with_config": {"my_config": "value"}},
+    }
 
     autopub.validate_config()
 
@@ -52,7 +54,9 @@ def test_validate_config_invalid():
 
     autopub = Autopub(plugins=[PluginWithConfig])
 
-    autopub.config = {"plugin_with_config": {"my_config": 123}}
+    autopub.config = {
+        "plugin_config": {"plugin_with_config": {"my_config": 123}},
+    }
 
     with pytest.raises(InvalidConfiguration) as e:
         autopub.validate_config()

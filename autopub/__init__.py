@@ -41,8 +41,8 @@ class Autopub:
     RELEASE_FILE_PATH = "RELEASE.md"
     plugins: list[AutopubPlugin]
 
-    def __init__(self) -> None:
-        self.plugins = []
+    def __init__(self, plugins: list[type[AutopubPlugin]] | None = None) -> None:
+        self.plugins = [plugin() for plugin in plugins or []]
 
     @cached_property
     def config(self) -> ConfigType:
@@ -86,7 +86,6 @@ class Autopub:
         return ReleaseInfo.from_dict(release_info)
 
     def load_plugins(self, default_plugins: list[str] | None = None) -> None:
-        print("🦆 loading plugins")
         default_plugins = default_plugins or []
 
         additional_plugins: list[str] = self.config.get("plugins", [])  # type: ignore
@@ -94,7 +93,6 @@ class Autopub:
         all_plugins = default_plugins + additional_plugins
 
         plugins = load_plugins(all_plugins)
-        print("plugins", plugins)
 
         self.plugins += [plugin_class() for plugin_class in plugins]
 

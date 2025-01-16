@@ -43,6 +43,7 @@ def test_loads_plugin_from_pyproject_toml(temporary_working_directory: Path):
     )
 
     autopub = Autopub()
+    autopub.load_plugins()
 
     assert len(autopub.plugins) == 1
     assert isinstance(autopub.plugins[0], AutopubPlugin)
