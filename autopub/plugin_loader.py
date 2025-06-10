@@ -1,3 +1,4 @@
+# TODO: use this instead: https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/
 from __future__ import annotations
 
 import os
