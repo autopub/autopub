@@ -31,7 +31,9 @@ class GithubConfig(BaseModel):
         """
         Thanks for adding the `RELEASE.md` file!
 
-        Here's a preview of the changelog:
+        Below is the changelog that will be used for the release.
+
+        ---
 
         {changelog}
         """,
@@ -43,7 +45,9 @@ class GithubConfig(BaseModel):
 
         Here's the error:
 
+        ```text
         {error}
+        ```
         """,
     )
 
@@ -322,7 +326,9 @@ class GithubPlugin(AutopubPlugin):
 
         changelog = self._get_release_message(release_info)
 
-        message = self.config.comment_template_success.format(changelog=changelog)
+        message = self.config.comment_template_success.format(
+            changelog=changelog.strip()
+        )
 
         self._update_or_create_comment(message)
 
@@ -339,7 +345,7 @@ class GithubPlugin(AutopubPlugin):
     def _get_release_message(
         self,
         release_info: ReleaseInfo,
-        include_release_info: bool = False,
+        include_release_info: bool = True,
         discussion_url: Optional[str] = None,
     ) -> str:
         assert self.pull_request is not None
@@ -354,7 +360,7 @@ class GithubPlugin(AutopubPlugin):
         if not include_release_info:
             return message
 
-        message += f"This release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
+        message += f"\nThis release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
 
         if contributors["additional_contributors"]:
             additional_contributors = [
