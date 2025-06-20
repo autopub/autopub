@@ -71,8 +71,8 @@ class GithubConfig(BaseModel):
         ```
         """)
 
-    include_sponsors: bool = True
-    create_discussions: bool = True
+    include_sponsors: bool = False
+    create_discussions: bool = False
     discussion_category: str = "Announcements"
 
 
