@@ -4,8 +4,8 @@ from pydantic import ValidationError
 class AutopubException(Exception):
     message: str
 
-    def __init__(self) -> None:
-        super().__init__(self.message)
+    def __init__(self, message: str | None = None) -> None:
+        super().__init__(message or self.message)
 
 
 class ReleaseFileNotFound(AutopubException):
