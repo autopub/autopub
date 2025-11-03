@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
+from autopub.plugins import AutopubPackageManagerPlugin
+from autopub.plugins.bump_version import BumpVersionPlugin
 
 
-class PoetryPlugin(AutopubPlugin, AutopubPackageManagerPlugin):
+class PoetryPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
     def build(self) -> None:
         self.run_command(["poetry", "build"])
 

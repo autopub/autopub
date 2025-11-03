@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import subprocess
 from typing import Any
 
-from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
+from autopub.plugins import AutopubPackageManagerPlugin
+from autopub.plugins.bump_version import BumpVersionPlugin
+from autopub.types import ReleaseInfo
 
 
-class UvPlugin(AutopubPlugin, AutopubPackageManagerPlugin):
+class UvPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
+    def post_prepare(self, release_info: ReleaseInfo) -> None:
+        # Call parent to update pyproject.toml and __version__ in __init__.py
+        super().post_prepare(release_info)
+
+        # Regenerate uv.lock after version bump
+        subprocess.run(["uv", "lock"], check=True)
+
     def build(self) -> None:
         self.run_command(["uv", "build"])
 

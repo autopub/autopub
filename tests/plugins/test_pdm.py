@@ -4,6 +4,7 @@ from pathlib import Path
 from pytest_httpserver import HTTPServer
 
 from autopub.plugins.pdm import PDMPlugin
+from autopub.types import ReleaseInfo
 
 
 def test_runs_build(example_project_pdm: Path):
@@ -44,3 +45,26 @@ def test_runs_publish(example_project_pdm: Path, httpserver: HTTPServer):
             ["pdm", "config", "--delete", "repository.example.username"], check=True
         )
         subprocess.run(["pdm", "config", "--delete", "repository.example.password"])
+
+
+def test_bumps_version_in_init_py(example_project_pdm: Path):
+    """Test that PDMPlugin updates __version__ in __init__.py."""
+    info = ReleaseInfo(
+        release_type="patch",
+        release_notes="",
+    )
+
+    # Check initial state
+    assert 'version = "0.1.0"' in (example_project_pdm / "pyproject.toml").read_text()
+    init_file = example_project_pdm / "src" / "__init__.py"
+    assert '__version__ = "0.1.0"' in init_file.read_text()
+
+    plugin = PDMPlugin()
+    plugin.post_check(info)
+    plugin.post_prepare(info)
+
+    # Check that pyproject.toml was updated
+    assert 'version = "0.1.1"' in (example_project_pdm / "pyproject.toml").read_text()
+
+    # Check that __version__ in __init__.py was updated
+    assert '__version__ = "0.1.1"' in init_file.read_text()

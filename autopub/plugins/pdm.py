@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from autopub.plugins import AutopubPackageManagerPlugin, AutopubPlugin
+from autopub.plugins import AutopubPackageManagerPlugin
+from autopub.plugins.bump_version import BumpVersionPlugin
 
 
-class PDMPlugin(AutopubPlugin, AutopubPackageManagerPlugin):
+class PDMPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
     def build(self) -> None:
         self.run_command(["pdm", "build"])
 
