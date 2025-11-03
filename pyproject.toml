@@ -1,6 +1,6 @@
 [project]
 requires-python = ">=3.9.0,<4.0"
-version = "1.0.0-alpha.48"
+version = "1.0.0-alpha.49"
 name = "autopub"
 description = "Automatic package release upon pull request merge"
 authors = [
