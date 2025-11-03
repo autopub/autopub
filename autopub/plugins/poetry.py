@@ -3,6 +3,8 @@ from __future__ import annotations
 from autopub.plugins import AutopubPackageManagerPlugin
 from autopub.plugins.bump_version import BumpVersionPlugin
 
+__all__ = ["PoetryPlugin"]
+
 
 class PoetryPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
     def build(self) -> None:

@@ -5,6 +5,8 @@ from typing import Any
 from autopub.plugins import AutopubPackageManagerPlugin
 from autopub.plugins.bump_version import BumpVersionPlugin
 
+__all__ = ["PDMPlugin"]
+
 
 class PDMPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
     def build(self) -> None:

@@ -7,6 +7,8 @@ from autopub.plugins import AutopubPackageManagerPlugin
 from autopub.plugins.bump_version import BumpVersionPlugin
 from autopub.types import ReleaseInfo
 
+__all__ = ["UvPlugin"]
+
 
 class UvPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
     def post_prepare(self, release_info: ReleaseInfo) -> None:
