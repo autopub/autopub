@@ -129,7 +129,12 @@ class GithubPlugin(AutopubPlugin):
         if self._event_data.get("pull_request"):
             return self._event_data["pull_request"]["number"]
 
-        sha = self._event_data["commits"][0]["id"]
+        # For push events (including PR merges), prefer head_commit over commits[0]
+        # as commits[0] may be a branch commit, not the merge commit
+        if self._event_data.get("head_commit"):
+            sha = self._event_data["head_commit"]["id"]
+        else:
+            sha = self._event_data["commits"][0]["id"]
 
         commit = self.repository.get_commit(sha)
 
@@ -322,7 +327,9 @@ class GithubPlugin(AutopubPlugin):
         return pr_contributors
 
     def on_release_notes_valid(self, release_info: ReleaseInfo) -> None:
-        assert self.pull_request is not None
+        if self.pull_request is None:
+            # No PR context (e.g., direct push with RELEASE.md), skip commenting
+            return
 
         changelog = self._get_release_message(release_info)
 
@@ -348,9 +355,6 @@ class GithubPlugin(AutopubPlugin):
         include_release_info: bool = True,
         discussion_url: Optional[str] = None,
     ) -> str:
-        assert self.pull_request is not None
-
-        contributors = self._get_pr_contributors()
         message = textwrap.dedent(
             f"""
             {release_info.release_notes}
@@ -360,6 +364,11 @@ class GithubPlugin(AutopubPlugin):
         if not include_release_info:
             return message
 
+        if self.pull_request is None:
+            # No PR context, just return the release notes
+            return message
+
+        contributors = self._get_pr_contributors()
         message += f"\nThis release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
 
         if contributors["additional_contributors"]:
@@ -413,12 +422,11 @@ class GithubPlugin(AutopubPlugin):
                 release.upload_asset(str(asset))
 
     def post_publish(self, release_info: ReleaseInfo) -> None:
-        text = f"This PR was published as {release_info.version}"
-        assert self.pull_request is not None
-
-        self._update_or_create_comment(
-            text, marker="<!-- autopub-comment-published -->"
-        )
+        if self.pull_request is not None:
+            text = f"This PR was published as {release_info.version}"
+            self._update_or_create_comment(
+                text, marker="<!-- autopub-comment-published -->"
+            )
 
         discussion_url = None
 
