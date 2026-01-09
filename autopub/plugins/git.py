@@ -1,9 +1,15 @@
 from __future__ import annotations
 
-import textwrap
-
 from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
+
+COMMIT_TEMPLATE = """\
+🤖 Release {release_info.version}
+
+{release_info.release_notes}
+
+[skip ci]
+"""
 
 
 class GitPlugin(AutopubPlugin):
@@ -17,15 +23,7 @@ class GitPlugin(AutopubPlugin):
 
         self.run_command(["git", "tag", tag_name])
 
-        commit_message = textwrap.dedent(
-            f"""
-            🤖 Release {release_info.version}
-
-            {release_info.release_notes}
-
-            [skip ci]
-            """
-        ).strip()
+        commit_message = COMMIT_TEMPLATE.format(release_info=release_info)
 
         # TODO: config?
         self.run_command(["git", "rm", "RELEASE.md"])

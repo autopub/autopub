@@ -72,6 +72,7 @@ class GithubConfig(BaseModel):
         """)
 
     include_sponsors: bool = False
+    include_reviewers: bool = False
     create_discussions: bool = False
     discussion_category: str = "Announcements"
 
@@ -355,11 +356,7 @@ class GithubPlugin(AutopubPlugin):
         include_release_info: bool = True,
         discussion_url: Optional[str] = None,
     ) -> str:
-        message = textwrap.dedent(
-            f"""
-            {release_info.release_notes}
-            """
-        )
+        message = release_info.release_notes
 
         if not include_release_info:
             return message
@@ -380,7 +377,7 @@ class GithubPlugin(AutopubPlugin):
                 f"\n\nAdditional contributors: {', '.join(additional_contributors)}"
             )
 
-        if contributors["reviewers"]:
+        if self.config.include_reviewers and contributors["reviewers"]:
             reviewers = [f"@{reviewer}" for reviewer in contributors["reviewers"]]
             message += f"\n\nReviewers: {', '.join(reviewers)}"
 
