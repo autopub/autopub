@@ -18,7 +18,6 @@ from autopub.types import ReleaseInfo
 class PRContributors(TypedDict):
     pr_author: str
     additional_contributors: set[str]
-    reviewers: set[str]
 
 
 class Sponsors(TypedDict):
@@ -72,7 +71,6 @@ class GithubConfig(BaseModel):
         """)
 
     include_sponsors: bool = False
-    include_reviewers: bool = False
     create_discussions: bool = False
     discussion_category: str = "Announcements"
 
@@ -306,7 +304,6 @@ class GithubPlugin(AutopubPlugin):
         pr_contributors = PRContributors(
             pr_author=pr_author,
             additional_contributors=set(),
-            reviewers=set(),
         )
 
         for commit in pr.get_commits():
@@ -321,16 +318,25 @@ class GithubPlugin(AutopubPlugin):
                     if author_login != pr_author:
                         pr_contributors["additional_contributors"].add(author_login)
 
-        for review in pr.get_reviews():
-            if review.user.login != pr_author:
-                pr_contributors["reviewers"].add(review.user.login)
-
         return pr_contributors
 
     def on_release_notes_valid(self, release_info: ReleaseInfo) -> None:
         if self.pull_request is None:
             # No PR context (e.g., direct push with RELEASE.md), skip commenting
             return
+
+        contributors = self._get_pr_contributors()
+        contributor_line = f"This release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
+        release_info.additional_release_notes.append(contributor_line)
+
+        if contributors["additional_contributors"]:
+            additional_contributors = [
+                f"@{contributor}"
+                for contributor in contributors["additional_contributors"]
+            ]
+            release_info.additional_release_notes.append(
+                f"Additional contributors: {', '.join(additional_contributors)}"
+            )
 
         changelog = self._get_release_message(release_info)
 
@@ -377,10 +383,6 @@ class GithubPlugin(AutopubPlugin):
                 f"\n\nAdditional contributors: {', '.join(additional_contributors)}"
             )
 
-        if self.config.include_reviewers and contributors["reviewers"]:
-            reviewers = [f"@{reviewer}" for reviewer in contributors["reviewers"]]
-            message += f"\n\nReviewers: {', '.join(reviewers)}"
-
         if self.config.include_sponsors:
             sponsors = self._get_sponsors()
             if sponsors["sponsors"]:
@@ -420,7 +422,10 @@ class GithubPlugin(AutopubPlugin):
 
     def post_publish(self, release_info: ReleaseInfo) -> None:
         if self.pull_request is not None:
-            text = f"This PR was published as {release_info.version}"
+            release_url = (
+                f"{self.repository.html_url}/releases/tag/{release_info.version}"
+            )
+            text = f"This PR was published as [{release_info.version}]({release_url}). Thank you for contributing!"
             self._update_or_create_comment(
                 text, marker="<!-- autopub-comment-published -->"
             )
