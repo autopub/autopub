@@ -326,7 +326,7 @@ class GithubPlugin(AutopubPlugin):
             return
 
         contributors = self._get_pr_contributors()
-        contributor_line = f"This release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
+        contributor_line = f"This release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
         release_info.additional_release_notes.append(contributor_line)
 
         if contributors["additional_contributors"]:
@@ -372,7 +372,7 @@ class GithubPlugin(AutopubPlugin):
             return message
 
         contributors = self._get_pr_contributors()
-        message += f"\nThis release was contributed by @{contributors['pr_author']} in #{self.pull_request.number}"
+        message += f"\nThis release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
 
         if contributors["additional_contributors"]:
             additional_contributors = [
