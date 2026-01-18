@@ -10,13 +10,46 @@ AutoPub is intended for use with continuous integration (CI) systems such as [Gi
 
 ## Configuration
 
-AutoPub settings can be configured via the `[tool.autopub]` table in the target project’s `pyproject.toml` file. Required settings include Git username and email address:
+AutoPub settings can be configured via the `[tool.autopub]` table in the target project's `pyproject.toml` file or via environment variables.
+
+### Git Configuration
+
+You can configure the git username and email used for release commits in three ways:
+
+#### 1. Via pyproject.toml (recommended for project-specific settings)
+
+```toml
+[tool.autopub.plugin_config.git]
+git-username = "Your Name"
+git-email = "your_email@example.com"
+```
+
+#### 2. Via environment variables (recommended for CI/CD)
+
+```bash
+export AUTOPUB_GIT_USERNAME="release-bot[bot]"
+export AUTOPUB_GIT_EMAIL="123456+release-bot[bot]@users.noreply.github.com"
+```
+
+Environment variables take precedence over pyproject.toml configuration.
+
+#### 3. Default values
+
+If neither environment variables nor pyproject.toml configuration is provided, autopub will use:
+- Username: `autopub`
+- Email: `autopub@autopub`
+
+### Legacy Configuration
+
+For backward compatibility, the old configuration format is still supported:
 
 ```toml
 [tool.autopub]
 git-username = "Your Name"
 git-email = "your_email@example.com"
 ```
+
+However, this format is deprecated and will be removed in a future release. Please migrate to the plugin_config format shown above.
 
 ## Release Files
 
