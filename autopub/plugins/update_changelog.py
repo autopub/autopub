@@ -22,35 +22,50 @@ class UpdateChangelogPlugin(AutopubPlugin):
 
         current_date = date.today().strftime("%Y-%m-%d")
 
-        old_changelog_data = ""
-        header = ""
-
         lines = self.changelog_file.read_text().splitlines()
 
-        for index, line in enumerate(lines):
-            if CHANGELOG_HEADER != line.strip():
-                continue
+        # Look for CHANGELOG header (e.g., "CHANGELOG\n=========")
+        header = []
+        old_changelog_data = []
+        header_found = False
 
-            old_changelog_data = lines[index + 1 :]
-            header = lines[: index + 1]
-            break
+        for index, line in enumerate(lines):
+            if CHANGELOG_HEADER == line.strip():
+                old_changelog_data = lines[index + 1 :]
+                header = lines[: index + 1]
+                header_found = True
+                break
+
+        # If no header found, treat all existing content as old changelog data
+        if not header_found:
+            old_changelog_data = lines
 
         new_version = release_info.version
 
         assert new_version is not None
 
         with self.changelog_file.open("w") as f:
-            f.write("\n".join(header))
-            f.write("\n")
+            # Write header if it exists
+            if header:
+                f.write("\n".join(header))
+                f.write("\n\n")
 
+            # Write new version entry
             new_version_header = f"{new_version} - {current_date}"
-
-            f.write(f"\n{new_version_header}\n")
+            f.write(f"{new_version_header}\n")
             f.write(f"{VERSION_HEADER * len(new_version_header)}\n\n")
             f.write(release_info.release_notes)
 
-            for line in release_info.additional_release_notes:
-                f.write(f"\n\n{line}")
+            if release_info.additional_release_notes:
+                for line in release_info.additional_release_notes:
+                    f.write(f"\n\n{line}")
 
-            f.write("\n")
-            f.write("\n".join(old_changelog_data))
+            # Write old changelog data (skip if empty or only whitespace)
+            old_content = "\n".join(old_changelog_data).strip()
+            if old_content:
+                f.write("\n\n")
+                # Strip leading empty lines from old changelog data to avoid extra blank lines
+                while old_changelog_data and old_changelog_data[0].strip() == "":
+                    old_changelog_data = old_changelog_data[1:]
+                # Preserve the original formatting including any trailing newlines
+                f.write("\n".join(old_changelog_data))

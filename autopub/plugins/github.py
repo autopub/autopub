@@ -326,12 +326,17 @@ class GithubPlugin(AutopubPlugin):
             return
 
         contributors = self._get_pr_contributors()
-        contributor_line = f"This release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
+        # Use markdown links for CHANGELOG
+        pr_author_link = f"[@{contributors['pr_author']}](https://github.com/{contributors['pr_author']})"
+        pr_link = f"[#{self.pull_request.number}]({self.pull_request.html_url})"
+        contributor_line = (
+            f"This release was contributed by {pr_author_link} in {pr_link}"
+        )
         release_info.additional_release_notes.append(contributor_line)
 
         if contributors["additional_contributors"]:
             additional_contributors = [
-                f"@{contributor}"
+                f"[@{contributor}](https://github.com/{contributor})"
                 for contributor in contributors["additional_contributors"]
             ]
             release_info.additional_release_notes.append(
@@ -372,7 +377,7 @@ class GithubPlugin(AutopubPlugin):
             return message
 
         contributors = self._get_pr_contributors()
-        message += f"\nThis release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
+        message += f"\n\nThis release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
 
         if contributors["additional_contributors"]:
             additional_contributors = [
