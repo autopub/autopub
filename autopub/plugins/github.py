@@ -372,7 +372,7 @@ class GithubPlugin(AutopubPlugin):
             return message
 
         contributors = self._get_pr_contributors()
-        message += f"\nThis release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
+        message += f"\n\nThis release was contributed by @{contributors['pr_author']} in {self.pull_request.html_url}"
 
         if contributors["additional_contributors"]:
             additional_contributors = [
