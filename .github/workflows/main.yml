@@ -29,7 +29,7 @@ jobs:
           curl -sSL https://pdm.fming.dev/install-pdm.py | python3 -
 
       - name: Install dependencies
-        run: uv sync 
+        run: uv sync
 
       - name: Run tests
         run: uv run pytest
