@@ -56,12 +56,16 @@ class UpdateChangelogPlugin(AutopubPlugin):
             f.write(f"{VERSION_HEADER * len(new_version_header)}\n\n")
             f.write(release_info.release_notes)
 
-            for line in release_info.additional_release_notes:
-                f.write(f"\n\n{line}")
+            if release_info.additional_release_notes:
+                for line in release_info.additional_release_notes:
+                    f.write(f"\n\n{line}")
 
             # Write old changelog data (skip if empty or only whitespace)
             old_content = "\n".join(old_changelog_data).strip()
             if old_content:
                 f.write("\n\n")
+                # Strip leading empty lines from old changelog data to avoid extra blank lines
+                while old_changelog_data and old_changelog_data[0].strip() == "":
+                    old_changelog_data = old_changelog_data[1:]
                 # Preserve the original formatting including any trailing newlines
                 f.write("\n".join(old_changelog_data))
