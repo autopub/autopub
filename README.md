@@ -27,8 +27,8 @@ git-email = "your_email@example.com"
 #### 2. Via environment variables (recommended for CI/CD)
 
 ```bash
-export AUTOPUB_GIT_USERNAME="release-bot[bot]"
-export AUTOPUB_GIT_EMAIL="123456+release-bot[bot]@users.noreply.github.com"
+export GIT_USERNAME="release-bot[bot]"
+export GIT_EMAIL="123456+release-bot[bot]@users.noreply.github.com"
 ```
 
 Environment variables take precedence over pyproject.toml configuration.

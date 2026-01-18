@@ -78,7 +78,7 @@ def test_post_publish_with_env_vars(mocker: MockerFixture) -> None:
     mock_run_command = mocker.patch.object(git_plugin, "run_command")
     mocker.patch.dict(
         "os.environ",
-        {"AUTOPUB_GIT_USERNAME": "env-user", "AUTOPUB_GIT_EMAIL": "env@example.com"},
+        {"GIT_USERNAME": "env-user", "GIT_EMAIL": "env@example.com"},
     )
 
     release_info = ReleaseInfo(

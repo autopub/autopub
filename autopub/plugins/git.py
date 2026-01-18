@@ -37,7 +37,7 @@ class GitPlugin(AutopubPlugin):
 
     def _get_git_username(self) -> str:
         """Get git username from environment variable or config."""
-        env_value = os.environ.get("AUTOPUB_GIT_USERNAME")
+        env_value = os.environ.get("GIT_USERNAME")
         if env_value:
             return env_value
 
@@ -48,7 +48,7 @@ class GitPlugin(AutopubPlugin):
 
     def _get_git_email(self) -> str:
         """Get git email from environment variable or config."""
-        env_value = os.environ.get("AUTOPUB_GIT_EMAIL")
+        env_value = os.environ.get("GIT_EMAIL")
         if env_value:
             return env_value
 
