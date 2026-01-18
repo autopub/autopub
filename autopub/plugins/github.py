@@ -61,7 +61,7 @@ class GithubConfig(BaseModel):
 
         ```markdown
         ---
-        release-type: patch
+        release type: patch
         ---
 
         Description of the changes, ideally with some examples, if adding a new feature.
