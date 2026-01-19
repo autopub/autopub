@@ -27,7 +27,12 @@ class AutopubPlugin:
         if configuration_class is None:
             return
 
-        plugin_config = config.get("plugin_config", {}).get(self.id, {})
+        # Support both tool.autopub.plugins.<id> and tool.autopub.plugin_config.<id>
+        plugin_config = config.get("plugins", {}).get(self.id, {})
+
+        if not plugin_config:
+            # Fallback to legacy plugin_config location
+            plugin_config = config.get("plugin_config", {}).get(self.id, {})
 
         self._config = configuration_class.model_validate(plugin_config)
 
