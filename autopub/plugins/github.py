@@ -425,6 +425,14 @@ class GithubPlugin(AutopubPlugin):
             if asset.suffix in [".gz", ".whl"]:
                 release.upload_asset(str(asset))
 
+    def pre_publish(self, release_info: ReleaseInfo) -> None:
+        # Set remote URL with token for authenticated pushes
+        if self.repository_name:
+            self.run_command([
+                "git", "remote", "set-url", "origin",
+                f"https://{self.github_token}@github.com/{self.repository_name}"
+            ])
+
     def post_publish(self, release_info: ReleaseInfo) -> None:
         if self.pull_request is not None:
             release_url = (

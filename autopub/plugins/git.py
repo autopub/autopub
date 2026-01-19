@@ -74,6 +74,7 @@ class GitPlugin(AutopubPlugin):
 
         # TODO: config?
         self.run_command(["git", "rm", "RELEASE.md"])
+        # TODO: this fails if autopub is git-ignored
         self.run_command(["git", "add", "--all", "--", ":!.autopub"])
         self.run_command(["git", "commit", "-m", commit_message])
         self.run_command(["git", "push"])
