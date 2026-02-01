@@ -13,7 +13,7 @@ wheels = [
 
 [[package]]
 name = "autopub"
-version = "1.0.0a54"
+version = "1.0.0a57"
 source = { editable = "." }
 dependencies = [
     { name = "dunamai" },

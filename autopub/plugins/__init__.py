@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Protocol, TypeVar, runtime_checkable
 
 from pydantic import BaseModel
@@ -28,7 +29,14 @@ class AutopubPlugin:
             return
 
         # Support both tool.autopub.plugins.<id> and tool.autopub.plugin_config.<id>
-        plugin_config = config.get("plugins", {}).get(self.id, {})
+        plugins_value = config.get("plugins", {})
+
+        # plugins can be a list of plugin module paths (e.g. ["autopub.plugins.github"])
+        # or a dict of plugin configs (e.g. {"git": {...}}). Only use .get() if it's a dict.
+        if isinstance(plugins_value, Mapping):
+            plugin_config = plugins_value.get(self.id, {})
+        else:
+            plugin_config = {}
 
         if not plugin_config:
             # Fallback to legacy plugin_config location
