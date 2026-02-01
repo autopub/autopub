@@ -25,7 +25,8 @@ class UvPlugin(BumpVersionPlugin, AutopubPackageManagerPlugin):
         additional_args: list[str] = []
 
         if repository:
-            raise ValueError("Not yet implemented")
+            additional_args.append("--index")
+            additional_args.append(repository)
 
         if publish_url := kwargs.get("publish_url"):
             additional_args.append("--publish-url")
