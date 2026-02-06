@@ -1,12 +1,15 @@
-[tool.poetry]
+[project]
+requires-python = ">=3.9.0,<4.0"
+version = "1.0.0-alpha.57"
 name = "autopub"
-version = "0.4.1"
 description = "Automatic package release upon pull request merge"
-authors = ["Justin Mayer <entroP@gmail.com>"]
+authors = [
+    { name = "Justin Mayer", email = "entroP@gmail.com" },
+    { name = "Patrick Arminio", email = "patrick.arminio@gmail.com" },
+]
 license = "AGPL-3.0"
 readme = "README.md"
 keywords = ["automatic", "packaging", "publish", "release", "version"]
-repository = "https://github.com/autopub/autopub"
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -17,47 +20,38 @@ classifiers = [
     "Topic :: System :: Software Distribution",
     "Topic :: System :: Systems Administration",
 ]
+dependencies = [
+    "dunamai>=1.23.0",
+    "pydantic>=2.10.5",
+    "pygithub>=2.5.0",
+    "python-frontmatter>=1.1.0",
+    "rich>=13.9.4",
+    "tomlkit>=0.13.2",
+    "typer>=0.15.1",
+]
 
-[tool.poetry.urls]
-"Issue Tracker" = "https://github.com/autopub/autopub/issues"
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-httpserver>=1.1.0",
+    "pytest-mock>=3.14.0",
+    "time-machine>=2.16.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10.0,<4.0"
-tomlkit = ">=0.5"
-build = ">=0.10.0"
-twine = ">=4.0.2"
-dunamai = ">=1.17.0"
+[project.scripts]
+autopub = "autopub.cli:app"
 
-# Optional GitHub-related dependencies
-backoff = {version = "~=2.1.2", optional = true}
-click = {version = "*", optional = true}
-linkheader = {version = "*", optional = true}
-requests = {version = "*", optional = true}
-httpx = {version = "*", optional = true}
+[project.urls]
+Source = "https://github.com/autopub/autopub"
+Issues = "https://github.com/autopub/autopub/issues"
 
-[tool.poetry.dev-dependencies]
-# Tasks
-invoke = "^1.6"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-# Docs
-furo = "^2021.9.22"
-livereload = "^2.6"
-myst-parser = "^0.15"
-Sphinx = "^4.2"
-
-# Linting
-black = "^24.3"
-flake8 = "^3.8"
-flake8-black = "^0.2"
-flake8-bugbear = "^20.0"
-flake8-fixme = "^1.1"
-flake8-markdown = "^0.2.0"
-
-[tool.poetry.extras]
-github = ["backoff", "click", "linkheader", "requests", "httpx"]
-
-[tool.poetry.scripts]
-autopub = "autopub.autopub:main"
+[tool.hatch.build.targets.sdist]
+only-include = ["autopub"]
 
 [tool.autopub]
 project-name = "AutoPub"
@@ -65,6 +59,8 @@ git-username = "botpub"
 git-email = "52496925+botpub@users.noreply.github.com"
 append-github-contributor = true
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff]
+select = ["I", "E", "F", "UP"]
+ignore = ["E501"]
+exclude = ["typings"]
+force-exclude = true
