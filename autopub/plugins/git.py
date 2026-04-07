@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import os
+import subprocess
 
 from pydantic import BaseModel, Field
 
+from autopub.exceptions import CommandFailed
 from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
 
@@ -34,6 +36,15 @@ class GitConfig(BaseModel):
 class GitPlugin(AutopubPlugin):
     id = "git"
     Config = GitConfig
+
+    def _is_autopub_ignored(self) -> bool:
+        command = ["git", "check-ignore", "-q", ".autopub"]
+        result = subprocess.run(command, env=os.environ.copy())
+
+        if result.returncode in (0, 1):
+            return result.returncode == 0
+
+        raise CommandFailed(command=command, returncode=result.returncode)
 
     def _get_git_username(self) -> str:
         """Get git username from environment variable or config."""
@@ -74,8 +85,10 @@ class GitPlugin(AutopubPlugin):
 
         # TODO: config?
         self.run_command(["git", "rm", "RELEASE.md"])
-        # TODO: this fails if autopub is git-ignored
-        self.run_command(["git", "add", "--all", "--", ":!.autopub"])
+        if self._is_autopub_ignored():
+            self.run_command(["git", "add", "--all"])
+        else:
+            self.run_command(["git", "add", "--all", "--", ":!.autopub"])
         self.run_command(["git", "commit", "-m", commit_message])
         self.run_command(["git", "push"])
         self.run_command(["git", "push", "origin", tag_name])
