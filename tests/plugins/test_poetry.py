@@ -15,13 +15,13 @@ def test_runs_build(example_project: Path):
 
 
 def test_runs_publish(example_project: Path, httpserver: HTTPServer):
-    httpserver.expect_request("/legacy").respond_with_data(
+    httpserver.expect_request("/legacy/").respond_with_data(
         "OK", status=200, content_type="text/plain"
     )
 
-    url = httpserver.url_for("/legacy")
+    url = httpserver.url_for("/legacy/")
 
-    subprocess.run(["poetry", "config", "repositories.example", url])
+    subprocess.run(["poetry", "config", "repositories.example", url], check=True)
 
     poetry = PoetryPlugin()
     poetry.build()

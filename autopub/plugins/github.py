@@ -2,15 +2,16 @@ import json
 import os
 import pathlib
 import textwrap
+import warnings
 from functools import cached_property
 from typing import Optional, TypedDict
 
-from github import Github
+from github import Github, GithubException
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from pydantic import BaseModel
 
-from autopub.exceptions import AutopubException
+from autopub.exceptions import AutopubException, AutopubWarning
 from autopub.plugins import AutopubPlugin
 from autopub.types import ReleaseInfo
 
@@ -149,18 +150,38 @@ class GithubPlugin(AutopubPlugin):
     def _update_or_create_comment(
         self, text: str, marker: str = "<!-- autopub-comment -->"
     ) -> None:
-        """Update or create a comment on the current PR with the given text."""
+        """Update or create a comment on the current PR with the given text.
+
+        Posting a comment is a best-effort side effect, not part of the release
+        itself. If there is no PR to comment on, or the GitHub API rejects the
+        request -- most commonly because the workflow token is missing
+        ``issues: write`` / ``pull-requests: write`` permissions -- we skip it
+        (warning on API errors) rather than failing the whole release.
+        """
+        if self.pull_request is None:
+            return
+
         comment_body = f"{marker}\n{text}"
 
-        # Search for existing comment
-        for comment in self.pull_request.get_issue_comments():
-            if marker in comment.body:
-                # Update existing comment
-                comment.edit(comment_body)
-                return
+        try:
+            # Update an existing comment if we've commented before...
+            for comment in self.pull_request.get_issue_comments():
+                if marker in comment.body:
+                    comment.edit(comment_body)
+                    return
 
-        # Create new comment if none exists
-        self.pull_request.create_issue_comment(comment_body)
+            # ...otherwise create a new one.
+            self.pull_request.create_issue_comment(comment_body)
+        except GithubException as exc:
+            warnings.warn(
+                f"Could not post a comment on pull request "
+                f"#{self.pull_request.number}: {exc}. This is usually caused by "
+                "the workflow token missing 'issues: write' / "
+                "'pull-requests: write' permissions; the release will continue "
+                "without it.",
+                AutopubWarning,
+                stacklevel=2,
+            )
 
     def _get_sponsors(self) -> Sponsors:
         query_organisation = """
