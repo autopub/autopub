@@ -8,6 +8,14 @@ class AutopubException(Exception):
         super().__init__(message or self.message)
 
 
+class AutopubWarning(UserWarning):
+    """Base class for non-fatal autopub warnings.
+
+    Used for problems that should be surfaced but must not abort a release,
+    such as failing to post a PR comment.
+    """
+
+
 class ReleaseFileNotFound(AutopubException):
     message = "Release file not found"
 

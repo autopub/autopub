@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from github import GithubException
 
+from autopub.exceptions import AutopubWarning
 from autopub.plugins.github import GithubPlugin
 from autopub.types import ReleaseInfo
 
@@ -213,3 +215,75 @@ def test_get_release_message_without_include_release_info(github_plugin):
     # Should return just the release notes, no contributor info
     assert message == "Simple fix"
     assert "@" not in message
+
+
+def test_update_or_create_comment_skips_without_pr(github_plugin):
+    """Without a PR there's nothing to comment on, so it's a no-op."""
+    github_plugin.pull_request = None
+
+    # Should not raise.
+    github_plugin._update_or_create_comment("hello")
+
+
+def test_update_or_create_comment_creates_when_none_exists(github_plugin):
+    """A new comment is created when no matching comment exists yet."""
+    mock_pr = MagicMock()
+    mock_pr.get_issue_comments.return_value = []
+    github_plugin.pull_request = mock_pr
+
+    github_plugin._update_or_create_comment("hello", marker="<!-- m -->")
+
+    mock_pr.create_issue_comment.assert_called_once_with("<!-- m -->\nhello")
+
+
+def test_update_or_create_comment_edits_existing(github_plugin):
+    """An existing comment with the same marker is edited, not duplicated."""
+    existing = MagicMock()
+    existing.body = "<!-- m -->\nold"
+    mock_pr = MagicMock()
+    mock_pr.get_issue_comments.return_value = [existing]
+    github_plugin.pull_request = mock_pr
+
+    github_plugin._update_or_create_comment("new", marker="<!-- m -->")
+
+    existing.edit.assert_called_once_with("<!-- m -->\nnew")
+    mock_pr.create_issue_comment.assert_not_called()
+
+
+def test_update_or_create_comment_warns_on_api_error(github_plugin):
+    """A GitHub API error (e.g. missing permissions) warns instead of raising."""
+    mock_pr = MagicMock()
+    mock_pr.number = 42
+    mock_pr.get_issue_comments.return_value = []
+    mock_pr.create_issue_comment.side_effect = GithubException(
+        403, {"message": "Resource not accessible by integration"}, None
+    )
+    github_plugin.pull_request = mock_pr
+
+    with pytest.warns(AutopubWarning, match="issues: write"):
+        github_plugin._update_or_create_comment("hello")
+
+
+def test_post_publish_creates_release_even_if_comment_fails(github_plugin):
+    """A failed publish comment must not stop the GitHub release from being created."""
+    mock_pr = MagicMock()
+    mock_pr.number = 7
+    mock_pr.get_issue_comments.return_value = []
+    mock_pr.create_issue_comment.side_effect = GithubException(
+        403, {"message": "Resource not accessible by integration"}, None
+    )
+    github_plugin.pull_request = mock_pr
+    github_plugin.repository = MagicMock()
+    github_plugin._create_release = MagicMock()
+
+    release_info = ReleaseInfo(
+        release_type="major",
+        release_notes="Release",
+        version="1.0.0",
+        previous_version="0.1.0",
+    )
+
+    with pytest.warns(AutopubWarning, match="Could not post a comment"):
+        github_plugin.post_publish(release_info)
+
+    github_plugin._create_release.assert_called_once()
