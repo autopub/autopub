@@ -129,12 +129,22 @@ class GithubPlugin(AutopubPlugin):
         if self._event_data.get("pull_request"):
             return self._event_data["pull_request"]["number"]
 
-        # For push events (including PR merges), prefer head_commit over commits[0]
-        # as commits[0] may be a branch commit, not the merge commit
+        # Resolve the commit SHA to find the associated PR. Push events
+        # (including PR merges) carry it in head_commit/commits[0]; workflow_run
+        # events carry it in workflow_run.head_sha; otherwise fall back to
+        # $GITHUB_SHA. This lets releases run on workflow_run (e.g. to collect
+        # multi-platform wheels built in a separate CI run) instead of only push.
         if self._event_data.get("head_commit"):
             sha = self._event_data["head_commit"]["id"]
-        else:
+        elif self._event_data.get("commits"):
             sha = self._event_data["commits"][0]["id"]
+        elif self._event_data.get("workflow_run"):
+            sha = self._event_data["workflow_run"].get("head_sha")
+        else:
+            sha = os.environ.get("GITHUB_SHA")
+
+        if not sha:
+            return None
 
         commit = self.repository.get_commit(sha)
 

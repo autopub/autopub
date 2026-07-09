@@ -318,3 +318,53 @@ def test_post_publish_creates_release_even_if_comment_fails(github_plugin):
         github_plugin.post_publish(release_info)
 
     github_plugin._create_release.assert_called_once()
+
+
+def _write_event(monkeypatch, tmp_path, payload):
+    import json
+
+    event_path = tmp_path / "event.json"
+    event_path.write_text(json.dumps(payload))
+    monkeypatch.setenv("GITHUB_EVENT_PATH", str(event_path))
+
+
+def test_get_pr_number_from_workflow_run_event(github_plugin, monkeypatch, tmp_path):
+    """A workflow_run payload has no top-level commits/head_commit; the SHA
+    comes from workflow_run.head_sha and must not raise KeyError."""
+    _write_event(monkeypatch, tmp_path, {"workflow_run": {"head_sha": "abc123"}})
+
+    mock_pr = MagicMock()
+    mock_pr.number = 42
+    mock_commit = MagicMock()
+    mock_commit.get_pulls.return_value = [mock_pr]
+    github_plugin.repository = MagicMock()
+    github_plugin.repository.get_commit.return_value = mock_commit
+
+    assert github_plugin._get_pr_number() == 42
+    github_plugin.repository.get_commit.assert_called_once_with("abc123")
+
+
+def test_get_pr_number_falls_back_to_github_sha(github_plugin, monkeypatch, tmp_path):
+    """When the payload carries no commit info, fall back to $GITHUB_SHA."""
+    _write_event(monkeypatch, tmp_path, {"action": "completed"})
+    monkeypatch.setenv("GITHUB_SHA", "def456")
+
+    mock_pr = MagicMock()
+    mock_pr.number = 7
+    mock_commit = MagicMock()
+    mock_commit.get_pulls.return_value = [mock_pr]
+    github_plugin.repository = MagicMock()
+    github_plugin.repository.get_commit.return_value = mock_commit
+
+    assert github_plugin._get_pr_number() == 7
+    github_plugin.repository.get_commit.assert_called_once_with("def456")
+
+
+def test_get_pr_number_returns_none_without_commit_info(github_plugin, monkeypatch, tmp_path):
+    """No commit info anywhere -> return None instead of raising."""
+    _write_event(monkeypatch, tmp_path, {"action": "completed"})
+    monkeypatch.delenv("GITHUB_SHA", raising=False)
+    github_plugin.repository = MagicMock()
+
+    assert github_plugin._get_pr_number() is None
+    github_plugin.repository.get_commit.assert_not_called()
