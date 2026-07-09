@@ -328,8 +328,12 @@ class GithubPlugin(AutopubPlugin):
         )
 
         for commit in pr.get_commits():
-            if commit.author.login != pr_author:
-                pr_contributors["additional_contributors"].add(commit.author.login)
+            commit_author_login = None
+            if commit.author is not None:
+                commit_author_login = commit.author.login
+
+            if commit_author_login and commit_author_login != pr_author:
+                pr_contributors["additional_contributors"].add(commit_author_login)
 
             for commit_message in commit.commit.message.split("\n"):
                 if commit_message.startswith("Co-authored-by:"):
@@ -449,10 +453,15 @@ class GithubPlugin(AutopubPlugin):
     def pre_publish(self, release_info: ReleaseInfo) -> None:
         # Set remote URL with token for authenticated pushes
         if self.repository_name:
-            self.run_command([
-                "git", "remote", "set-url", "origin",
-                f"https://{self.github_token}@github.com/{self.repository_name}"
-            ])
+            self.run_command(
+                [
+                    "git",
+                    "remote",
+                    "set-url",
+                    "origin",
+                    f"https://{self.github_token}@github.com/{self.repository_name}",
+                ]
+            )
 
     def post_publish(self, release_info: ReleaseInfo) -> None:
         if self.pull_request is not None:

@@ -97,6 +97,37 @@ def test_on_release_notes_valid_with_additional_contributors(github_plugin):
     )
 
 
+def test_on_release_notes_valid_with_unlinked_commit_author(github_plugin):
+    """Test that commits without linked GitHub authors do not crash."""
+    mock_pr = MagicMock()
+    mock_pr.number = 457
+    mock_pr.html_url = "https://github.com/owner/repo/pull/457"
+    mock_pr.user.login = "main-author"
+
+    mock_commit = MagicMock()
+    mock_commit.author = None
+    mock_commit.commit.message = "Some commit"
+    mock_pr.get_commits.return_value = [mock_commit]
+    mock_pr.get_issue_comments.return_value = []
+
+    github_plugin.pull_request = mock_pr
+
+    release_info = ReleaseInfo(
+        release_type="patch",
+        release_notes="Bug fix",
+        version="1.0.1",
+        previous_version="1.0.0",
+    )
+
+    github_plugin.on_release_notes_valid(release_info)
+
+    assert len(release_info.additional_release_notes) == 1
+    assert (
+        "[@main-author](https://github.com/main-author)"
+        in release_info.additional_release_notes[0]
+    )
+
+
 def test_on_release_notes_valid_with_co_authored_by(github_plugin):
     """Test that Co-authored-by trailers are parsed correctly."""
     mock_pr = MagicMock()
