@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from github import GithubException
 
-from autopub.exceptions import AutopubWarning
+from autopub.exceptions import AutopubException, AutopubWarning
 from autopub.plugins.github import GithubPlugin
 from autopub.types import ReleaseInfo
 
@@ -281,6 +281,27 @@ def test_update_or_create_comment_edits_existing(github_plugin):
     mock_pr.create_issue_comment.assert_not_called()
 
 
+def test_release_validation_hooks_skip_comments_for_closed_pr(github_plugin):
+    """Release validation does not call the comment helper after a PR closes."""
+    mock_pr = MagicMock()
+    mock_pr.state = "closed"
+    github_plugin.pull_request = mock_pr
+    github_plugin._update_or_create_comment = MagicMock()
+
+    release_info = ReleaseInfo(
+        release_type="patch",
+        release_notes="Bug fix",
+        version="1.0.1",
+        previous_version="1.0.0",
+    )
+
+    github_plugin.on_release_notes_valid(release_info)
+    github_plugin.on_release_file_not_found()
+    github_plugin.on_release_notes_invalid(AutopubException("invalid release"))
+
+    github_plugin._update_or_create_comment.assert_not_called()
+
+
 def test_update_or_create_comment_warns_on_api_error(github_plugin):
     """A GitHub API error (e.g. missing permissions) warns instead of raising."""
     mock_pr = MagicMock()
@@ -299,6 +320,7 @@ def test_post_publish_creates_release_even_if_comment_fails(github_plugin):
     """A failed publish comment must not stop the GitHub release from being created."""
     mock_pr = MagicMock()
     mock_pr.number = 7
+    mock_pr.state = "closed"
     mock_pr.get_issue_comments.return_value = []
     mock_pr.create_issue_comment.side_effect = GithubException(
         403, {"message": "Resource not accessible by integration"}, None
@@ -360,7 +382,9 @@ def test_get_pr_number_falls_back_to_github_sha(github_plugin, monkeypatch, tmp_
     github_plugin.repository.get_commit.assert_called_once_with("def456")
 
 
-def test_get_pr_number_returns_none_without_commit_info(github_plugin, monkeypatch, tmp_path):
+def test_get_pr_number_returns_none_without_commit_info(
+    github_plugin, monkeypatch, tmp_path
+):
     """No commit info anywhere -> return None instead of raising."""
     _write_event(monkeypatch, tmp_path, {"action": "completed"})
     monkeypatch.delenv("GITHUB_SHA", raising=False)

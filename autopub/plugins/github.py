@@ -378,6 +378,9 @@ class GithubPlugin(AutopubPlugin):
                 f"Additional contributors: {', '.join(additional_contributors)}"
             )
 
+        if self.pull_request.state != "open":
+            return
+
         changelog = self._get_release_message(release_info)
 
         message = self.config.comment_template_success.format(
@@ -387,11 +390,17 @@ class GithubPlugin(AutopubPlugin):
         self._update_or_create_comment(message)
 
     def on_release_file_not_found(self) -> None:
+        if self.pull_request is None or self.pull_request.state != "open":
+            return
+
         message = self.config.comment_template_missing_release
 
         self._update_or_create_comment(message)
 
     def on_release_notes_invalid(self, exception: AutopubException) -> None:
+        if self.pull_request is None or self.pull_request.state != "open":
+            return
+
         message = self.config.comment_template_error.format(error=str(exception))
 
         self._update_or_create_comment(message)
