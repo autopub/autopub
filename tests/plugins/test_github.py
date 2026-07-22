@@ -281,10 +281,26 @@ def test_update_or_create_comment_edits_existing(github_plugin):
     mock_pr.create_issue_comment.assert_not_called()
 
 
-def test_release_validation_hooks_skip_comments_for_closed_pr(github_plugin):
-    """Release validation does not call the comment helper after a PR closes."""
+@pytest.mark.parametrize(
+    ("event_name", "expected_comment_count"),
+    [
+        ("push", 0),
+        ("workflow_run", 0),
+        ("pull_request", 3),
+        ("pull_request_target", 3),
+    ],
+)
+def test_release_validation_comments_follow_event_context(
+    github_plugin, monkeypatch, event_name, expected_comment_count
+):
+    """Only pull request checks leave release validation feedback."""
+    monkeypatch.setenv("GITHUB_EVENT_NAME", event_name)
+
     mock_pr = MagicMock()
-    mock_pr.state = "closed"
+    mock_pr.number = 123
+    mock_pr.html_url = "https://github.com/owner/repo/pull/123"
+    mock_pr.user.login = "contributor"
+    mock_pr.get_commits.return_value = []
     github_plugin.pull_request = mock_pr
     github_plugin._update_or_create_comment = MagicMock()
 
@@ -299,7 +315,8 @@ def test_release_validation_hooks_skip_comments_for_closed_pr(github_plugin):
     github_plugin.on_release_file_not_found()
     github_plugin.on_release_notes_invalid(AutopubException("invalid release"))
 
-    github_plugin._update_or_create_comment.assert_not_called()
+    assert github_plugin._update_or_create_comment.call_count == expected_comment_count
+    assert len(release_info.additional_release_notes) == 1
 
 
 def test_update_or_create_comment_warns_on_api_error(github_plugin):
@@ -316,11 +333,12 @@ def test_update_or_create_comment_warns_on_api_error(github_plugin):
         github_plugin._update_or_create_comment("hello")
 
 
-def test_post_publish_creates_release_even_if_comment_fails(github_plugin):
+def test_post_publish_creates_release_even_if_comment_fails(github_plugin, monkeypatch):
     """A failed publish comment must not stop the GitHub release from being created."""
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
+
     mock_pr = MagicMock()
     mock_pr.number = 7
-    mock_pr.state = "closed"
     mock_pr.get_issue_comments.return_value = []
     mock_pr.create_issue_comment.side_effect = GithubException(
         403, {"message": "Resource not accessible by integration"}, None

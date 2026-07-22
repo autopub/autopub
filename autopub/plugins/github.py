@@ -193,6 +193,19 @@ class GithubPlugin(AutopubPlugin):
                 stacklevel=2,
             )
 
+    def _should_comment_on_release_check(self) -> bool:
+        """Return whether release validation feedback belongs on a PR.
+
+        Pull request workflows use ``autopub check`` to give contributors
+        feedback. Release workflows also run the command as a gate after merge,
+        but should report failures through their job status instead of commenting
+        on the associated PR.
+        """
+        return os.environ.get("GITHUB_EVENT_NAME") in {
+            "pull_request",
+            "pull_request_target",
+        }
+
     def _get_sponsors(self) -> Sponsors:
         query_organisation = """
             query GetSponsors($organization: String!) {
@@ -378,7 +391,7 @@ class GithubPlugin(AutopubPlugin):
                 f"Additional contributors: {', '.join(additional_contributors)}"
             )
 
-        if self.pull_request.state != "open":
+        if not self._should_comment_on_release_check():
             return
 
         changelog = self._get_release_message(release_info)
@@ -390,7 +403,7 @@ class GithubPlugin(AutopubPlugin):
         self._update_or_create_comment(message)
 
     def on_release_file_not_found(self) -> None:
-        if self.pull_request is None or self.pull_request.state != "open":
+        if not self._should_comment_on_release_check():
             return
 
         message = self.config.comment_template_missing_release
@@ -398,7 +411,7 @@ class GithubPlugin(AutopubPlugin):
         self._update_or_create_comment(message)
 
     def on_release_notes_invalid(self, exception: AutopubException) -> None:
-        if self.pull_request is None or self.pull_request.state != "open":
+        if not self._should_comment_on_release_check():
             return
 
         message = self.config.comment_template_error.format(error=str(exception))
