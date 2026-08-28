@@ -1,5 +1,9 @@
+import subprocess
+
+import pytest
 from pytest_mock import MockerFixture
 
+from autopub.exceptions import CommandFailed
 from autopub.plugins.git import GitConfig, GitPlugin
 from autopub.types import ReleaseInfo
 
@@ -8,6 +12,9 @@ def test_post_publish(mocker: MockerFixture) -> None:
     git_plugin = GitPlugin()
 
     mock_run_command = mocker.patch.object(git_plugin, "run_command")
+    mock_is_autopub_ignored = mocker.patch.object(
+        git_plugin, "_is_autopub_ignored", return_value=False
+    )
 
     release_info = ReleaseInfo(
         release_notes="",
@@ -18,6 +25,8 @@ def test_post_publish(mocker: MockerFixture) -> None:
     )
 
     git_plugin.post_publish(release_info)
+
+    mock_is_autopub_ignored.assert_called_once_with()
 
     mock_run_command.assert_any_call(
         ["git", "config", "--global", "user.email", "autopub@autopub"]
@@ -46,6 +55,7 @@ def test_post_publish_with_config(mocker: MockerFixture) -> None:
     git_plugin.validate_config(config)
 
     mock_run_command = mocker.patch.object(git_plugin, "run_command")
+    mocker.patch.object(git_plugin, "_is_autopub_ignored", return_value=False)
 
     release_info = ReleaseInfo(
         release_notes="test release",
@@ -76,6 +86,7 @@ def test_post_publish_with_env_vars(mocker: MockerFixture) -> None:
     git_plugin.validate_config(config)
 
     mock_run_command = mocker.patch.object(git_plugin, "run_command")
+    mocker.patch.object(git_plugin, "_is_autopub_ignored", return_value=False)
     mocker.patch.dict(
         "os.environ",
         {"GIT_USERNAME": "env-user", "GIT_EMAIL": "env@example.com"},
@@ -98,6 +109,64 @@ def test_post_publish_with_env_vars(mocker: MockerFixture) -> None:
     mock_run_command.assert_any_call(
         ["git", "config", "--global", "user.name", "env-user"]
     )
+
+
+def test_post_publish_when_autopub_is_ignored(mocker: MockerFixture) -> None:
+    git_plugin = GitPlugin()
+
+    mock_run_command = mocker.patch.object(git_plugin, "run_command")
+    mocker.patch.object(git_plugin, "_is_autopub_ignored", return_value=True)
+
+    release_info = ReleaseInfo(
+        release_notes="",
+        release_type="patch",
+        additional_info={},
+        version="v1.0.1",
+        previous_version="v1.0.0",
+    )
+
+    git_plugin.post_publish(release_info)
+
+    recorded_commands = [call.args[0] for call in mock_run_command.call_args_list]
+    assert ["git", "add", "--all"] in recorded_commands
+    assert ["git", "add", "--all", "--", ":!.autopub"] not in recorded_commands
+
+
+def test_is_autopub_ignored(mocker: MockerFixture) -> None:
+    git_plugin = GitPlugin()
+    mocker.patch(
+        "autopub.plugins.git.subprocess.run",
+        return_value=subprocess.CompletedProcess(
+            ["git", "check-ignore", "-q", ".autopub"], 0
+        ),
+    )
+
+    assert git_plugin._is_autopub_ignored() is True
+
+
+def test_is_autopub_not_ignored(mocker: MockerFixture) -> None:
+    git_plugin = GitPlugin()
+    mocker.patch(
+        "autopub.plugins.git.subprocess.run",
+        return_value=subprocess.CompletedProcess(
+            ["git", "check-ignore", "-q", ".autopub"], 1
+        ),
+    )
+
+    assert git_plugin._is_autopub_ignored() is False
+
+
+def test_is_autopub_ignored_raises_on_git_error(mocker: MockerFixture) -> None:
+    git_plugin = GitPlugin()
+    mocker.patch(
+        "autopub.plugins.git.subprocess.run",
+        return_value=subprocess.CompletedProcess(
+            ["git", "check-ignore", "-q", ".autopub"], 128
+        ),
+    )
+
+    with pytest.raises(CommandFailed, match="git check-ignore -q .autopub"):
+        git_plugin._is_autopub_ignored()
 
 
 def test_git_config_validation() -> None:
