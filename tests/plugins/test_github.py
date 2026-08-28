@@ -139,12 +139,29 @@ def test_on_release_notes_valid_with_co_authored_by(github_plugin):
     mock_commit = MagicMock()
     mock_commit.author.login = "author"
     mock_commit.commit.message = (
-        "Fix bug\n\nCo-authored-by: helper <helper@example.com>"
+        "Fix bug\n\nCo-authored-by: Helpful Person <helper@example.com>"
     )
+    mock_commit.raw_data = {"node_id": "commit-id"}
     mock_pr.get_commits.return_value = [mock_commit]
     mock_pr.get_issue_comments.return_value = []
 
     github_plugin.pull_request = mock_pr
+    github_plugin.__dict__["_github"] = MagicMock()
+    github_plugin._github.requester.graphql_query.return_value = (
+        None,
+        {
+            "data": {
+                "node": {
+                    "authors": {
+                        "nodes": [
+                            {"user": {"login": "author"}},
+                            {"user": {"login": "helper"}},
+                        ]
+                    }
+                }
+            }
+        },
+    )
 
     release_info = ReleaseInfo(
         release_type="patch",
@@ -161,6 +178,44 @@ def test_on_release_notes_valid_with_co_authored_by(github_plugin):
         "[@helper](https://github.com/helper)"
         in release_info.additional_release_notes[1]
     )
+
+
+def test_get_pr_contributors_does_not_treat_coauthor_name_as_login(github_plugin):
+    mock_pr = MagicMock()
+    mock_pr.user.login = "patrick91"
+
+    mock_commit = MagicMock()
+    mock_commit.author.login = "ampagent"
+    mock_commit.commit.message = (
+        "Fix bug\n\nCo-authored-by: Patrick Arminio <patrick.arminio@gmail.com>"
+    )
+    mock_commit.raw_data = {"node_id": "commit-id"}
+    mock_pr.get_commits.return_value = [mock_commit]
+
+    github_plugin.pull_request = mock_pr
+    github_plugin.__dict__["_github"] = MagicMock()
+    github_plugin._github.requester.graphql_query.return_value = (
+        None,
+        {
+            "data": {
+                "node": {
+                    "authors": {
+                        "nodes": [
+                            {"user": {"login": "ampagent"}},
+                            {"user": {"login": "patrick91"}},
+                        ]
+                    }
+                }
+            }
+        },
+    )
+
+    contributors = github_plugin._get_pr_contributors()
+
+    assert contributors == {
+        "pr_author": "patrick91",
+        "additional_contributors": {"ampagent"},
+    }
 
 
 def test_on_release_notes_valid_no_pr_context(github_plugin):
