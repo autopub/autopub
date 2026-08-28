@@ -341,6 +341,31 @@ class GithubPlugin(AutopubPlugin):
 
         return response["data"]["createDiscussion"]["discussion"]["url"]
 
+    def _get_commit_author_logins(self, commit_node_id: str) -> set[str]:
+        query = """
+            query GetCommitAuthors($commitId: ID!) {
+                node(id: $commitId) {
+                    ... on Commit {
+                        authors(first: 100) {
+                            nodes {
+                                user {
+                                    login
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """
+
+        _, response = self._github.requester.graphql_query(
+            query, {"commitId": commit_node_id}
+        )
+
+        authors = response["data"]["node"]["authors"]["nodes"]
+
+        return {author["user"]["login"] for author in authors if author["user"]}
+
     def _get_pr_contributors(self) -> PRContributors:
         pr: PullRequest = self.pull_request
 
@@ -360,11 +385,13 @@ class GithubPlugin(AutopubPlugin):
 
             for commit_message in commit.commit.message.split("\n"):
                 if commit_message.startswith("Co-authored-by:"):
-                    author = commit_message.split(":")[1].strip()
-                    author_login = author.split(" ")[0]
-
-                    if author_login != pr_author:
-                        pr_contributors["additional_contributors"].add(author_login)
+                    coauthors = self._get_commit_author_logins(
+                        commit.raw_data["node_id"]
+                    )
+                    pr_contributors["additional_contributors"].update(
+                        coauthors - {pr_author}
+                    )
+                    break
 
         return pr_contributors
 
