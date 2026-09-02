@@ -1,3 +1,5 @@
+from unittest.mock import call
+
 from pytest_mock import MockerFixture
 
 from autopub.plugins.git import GitConfig, GitPlugin
@@ -19,20 +21,16 @@ def test_post_publish(mocker: MockerFixture) -> None:
 
     git_plugin.post_publish(release_info)
 
-    mock_run_command.assert_any_call(
-        ["git", "config", "--global", "user.email", "autopub@autopub"]
-    )
-    mock_run_command.assert_any_call(
-        ["git", "config", "--global", "user.name", "autopub"]
-    )
-    mock_run_command.assert_any_call(["git", "tag", "v1.0.0"])
-    mock_run_command.assert_any_call(["git", "rm", "RELEASE.md"])
-    mock_run_command.assert_any_call(["git", "add", "--all", "--", ":!.autopub"])
-    mock_run_command.assert_any_call(
-        ["git", "commit", "-m", "🤖 Release v1.0.0\n\n\n\n[skip ci]\n"]
-    )
-    mock_run_command.assert_any_call(["git", "push"])
-    mock_run_command.assert_any_call(["git", "push", "origin", "v1.0.0"])
+    assert mock_run_command.call_args_list == [
+        call(["git", "config", "--global", "user.email", "autopub@autopub"]),
+        call(["git", "config", "--global", "user.name", "autopub"]),
+        call(["git", "rm", "RELEASE.md"]),
+        call(["git", "add", "--all", "--", ":!.autopub"]),
+        call(["git", "commit", "-m", "🤖 Release v1.0.0\n\n\n\n[skip ci]\n"]),
+        call(["git", "tag", "v1.0.0"]),
+        call(["git", "push"]),
+        call(["git", "push", "origin", "v1.0.0"]),
+    ]
 
 
 def test_post_publish_with_config(mocker: MockerFixture) -> None:

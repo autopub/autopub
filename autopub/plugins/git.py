@@ -68,8 +68,6 @@ class GitPlugin(AutopubPlugin):
         self.run_command(["git", "config", "--global", "user.email", git_email])
         self.run_command(["git", "config", "--global", "user.name", git_username])
 
-        self.run_command(["git", "tag", tag_name])
-
         commit_message = COMMIT_TEMPLATE.format(release_info=release_info)
 
         # TODO: config?
@@ -77,5 +75,6 @@ class GitPlugin(AutopubPlugin):
         # TODO: this fails if autopub is git-ignored
         self.run_command(["git", "add", "--all", "--", ":!.autopub"])
         self.run_command(["git", "commit", "-m", commit_message])
+        self.run_command(["git", "tag", tag_name])
         self.run_command(["git", "push"])
         self.run_command(["git", "push", "origin", tag_name])
